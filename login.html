@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Iniciar sesión - Orquídeas</title>
+
+    <!-- Tipografías del rediseño; sin red, las del sistema (spec 104 FR-1.c) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Inicio de sesión en dos columnas (spec 104 FR-5) -->
+    <style>
+        .login {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .login-art {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 32px;
+            padding: 48px;
+            background: var(--brand);
+            color: #e8f2ec; /* oscura en ambos temas, como la barra lateral */
+        }
+
+        .login-art .logo {
+            padding: 0;
+        }
+
+        .login-art .texto {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .login-art h1 {
+            max-width: 12ch;
+            font-size: 40px;
+            line-height: 1.1;
+        }
+
+        .login-art p {
+            max-width: 36ch;
+            opacity: 0.8;
+        }
+
+        .login-art .flor {
+            position: absolute;
+            right: -60px;
+            bottom: -60px;
+            width: 340px;
+            height: 340px;
+            opacity: 0.22;
+        }
+
+        .login-form {
+            display: grid;
+            place-items: center;
+            padding: 32px 16px;
+        }
+
+        .login-form form {
+            width: min(380px, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .login-form h2 {
+            font-size: 28px;
+        }
+
+        .login-form .sub {
+            color: var(--muted);
+        }
+
+        .login-form .btn.primary {
+            justify-content: center;
+            padding: 11px;
+            font-size: 15px;
+        }
+
+        .login-form .mensaje {
+            color: var(--hot-fg);
+            font-size: 14px;
+        }
+
+        .login-form .mensaje:empty {
+            display: none;
+        }
+
+        .login-form .swap {
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .login-form .swap button {
+            padding: 0;
+            border: 0;
+            background: none;
+            color: var(--brand-2);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Pantalla angosta: la presentación arriba del formulario (FR-5.d) */
+        @media (max-width: 720px) {
+            .login {
+                grid-template-columns: 1fr;
+            }
+
+            .login-art {
+                padding: 28px 16px;
+            }
+
+            .login-art h1 {
+                font-size: 28px;
+            }
+
+            .login-art .flor {
+                right: -40px;
+                bottom: -50px;
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login">
+
+        <!-- PRESENTACION (FR-5.a) -->
+        <div class="login-art">
+
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
+                    <g id="flor">
+                        <g fill="#e7a9d6">
+                            <ellipse cx="16" cy="8" rx="5" ry="7"/>
+                            <ellipse cx="8" cy="15" rx="7" ry="4.5" transform="rotate(-20 8 15)"/>
+                            <ellipse cx="24" cy="15" rx="7" ry="4.5" transform="rotate(20 24 15)"/>
+                        </g>
+                        <path d="M12 20c1 5 7 5 8 0-2 2-6 2-8 0z" fill="#fff"/>
+                        <circle cx="16" cy="16" r="2.5" fill="#f6d77a"/>
+                    </g>
+                </svg>
+                <span>Orquídeas</span>
+            </div>
+
+            <div class="texto">
+                <h1>Riego y clima de tus orquídeas, en un lugar.</h1>
+                <p>Programa los riegos, mira la humedad y la temperatura del invernadero y recibe un aviso cuando algo sale de rango.</p>
+            </div>
+
+            <svg class="flor" viewBox="0 0 32 32" aria-hidden="true"><use href="#flor"/></svg>
+
+        </div>
+
+        <!-- FORMULARIO (FR-5.b, FR-5.c) -->
+        <div class="login-form">
+
+            <form id="formLogin">
+
+                <div>
+                    <h2 id="tituloLogin">Iniciar sesión</h2>
+                    <p id="subLogin" class="sub">Entra con tu correo y contraseña.</p>
+                </div>
+
+                <label class="field" id="campoNombre" hidden>
+                    Nombre
+                    <input type="text" id="nombre" maxlength="100" autocomplete="name">
+                </label>
+
+                <label class="field">
+                    Correo
+                    <input type="email" id="email" required maxlength="150" autocomplete="email">
+                </label>
+
+                <label class="field">
+                    Contraseña
+                    <input type="password" id="password" required autocomplete="current-password">
+                </label>
+
+                <p id="mensajeLogin" class="mensaje" role="alert"></p>
+
+                <button id="enviarLogin" class="btn primary" type="submit">Entrar</button>
+
+                <p class="swap">
+                    <span id="textoModo">¿No tienes cuenta?</span>
+                    <button id="cambiarModo" type="button">Crear cuenta</button>
+                </p>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="api.js"></script>
+
+    <script>
+
+        const formLogin = document.getElementById("formLogin");
+        const campoNombre = document.getElementById("campoNombre");
+        const nombre = document.getElementById("nombre");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const mensajeLogin = document.getElementById("mensajeLogin");
+        const cambiarModo = document.getElementById("cambiarModo");
+
+        let registrando = false;
+
+
+        // ALTERNAR ENTRE INICIAR SESION Y CREAR CUENTA (spec 104 FR-5.b, FR-5.c)
+
+        cambiarModo.addEventListener("click", function() {
+
+            registrando = !registrando;
+
+            campoNombre.hidden = !registrando;
+            nombre.required = registrando;
+
+            password.autocomplete = registrando ? "new-password" : "current-password";
+
+            document.getElementById("tituloLogin").textContent =
+                registrando ? "Crear cuenta" : "Iniciar sesión";
+
+            document.getElementById("subLogin").textContent = registrando
+                ? "Solo necesitas tu nombre, correo y una contraseña."
+                : "Entra con tu correo y contraseña.";
+
+            document.getElementById("enviarLogin").textContent =
+                registrando ? "Crear cuenta" : "Entrar";
+
+            document.getElementById("textoModo").textContent =
+                registrando ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?";
+
+            cambiarModo.textContent =
+                registrando ? "Iniciar sesión" : "Crear cuenta";
+
+            mensajeLogin.textContent = "";
+
+        });
+
+
+        // ENVIAR FORMULARIO
+
+        formLogin.addEventListener("submit", async function(evento) {
+
+            evento.preventDefault();
+
+            mensajeLogin.textContent = "";
+
+            try {
+
+                if (registrando) {
+
+                    await api("/auth/register", {
+                        method: "POST",
+                        body: {
+                            name: nombre.value,
+                            email: email.value,
+                            password: password.value
+                        }
+                    });
+
+                }
+
+                // El login de FastAPI usa formulario y llama "username" al correo.
+
+                const sesion = await api("/auth/login", {
+                    method: "POST",
+                    form: {
+                        username: email.value,
+                        password: password.value
+                    }
+                });
+
+                localStorage.setItem("token", sesion.access_token);
+
+                location.href = "Home/home.html";
+
+            } catch (error) {
+
+                mensajeLogin.textContent = error.message;
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

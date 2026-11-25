@@ -1,434 +1,220 @@
-
 /* =====================================
-   ESTILOS GENERALES DE LA PANTALLA DATOS
+   DATOS (spec 101, 106)
 ===================================== */
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* ESTADO GENERAL (106 FR-1) */
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f7f3;
-    color: #244d3a;
-}
-
-/* =====================================
-   CONTENEDOR PRINCIPAL
-===================================== */
-
-.contenedor {
+.estado {
     display: flex;
-    min-height: 100vh;
-    width: 100%;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 500;
 }
 
-/* =====================================
-   BARRA LATERAL
-===================================== */
+.estado.ok   { background: var(--ok-bg);  color: var(--ok-fg); }
+.estado.hot  { background: var(--hot-bg); color: var(--hot-fg); }
+.estado.none { background: var(--sunken); color: var(--muted); }
 
-.sidebar {
-    width: 232px;
-    min-width: 232px;
-    background-color: #214d3b;
-    color: white;
-    padding: 22px 17px;
+.estado .pulse {
+    flex-shrink: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 20%, transparent);
 }
 
-.sidebar h2 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 40px;
+/* El texto ocupa lo que queda junto al punto; al angostar, la antigüedad baja */
+#textoEstado {
+    flex: 1;
 }
 
-.sidebar nav {
+.estado small {
+    margin-left: auto;
+    color: var(--muted);
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.aviso-datos {
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--hot-bg);
+    color: var(--hot-fg);
+}
+
+/* PERIODO EN EL ENCABEZADO (106 FR-2) */
+
+.periodo {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 10px;
+    background: var(--sunken);
+}
+
+.periodo button {
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.periodo button[aria-pressed="true"] {
+    background: var(--surface);
+    color: var(--fg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* TARJETAS DE SENSOR (106 FR-3) */
+
+.sensores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.sensor {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
 }
 
-.sidebar nav a {
-    display: block;
-    text-decoration: none;
-    color: white;
-    padding: 14px 13px;
-    border-radius: 9px;
+.sensor-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 8px;
+}
+
+.sensor h3 {
+    font-family: var(--font-body);
     font-size: 15px;
-    transition: background-color 0.2s ease;
+    font-weight: 600;
 }
 
-.sidebar nav a:hover {
-    background-color: #32694e;
+.sensor .tipo {
+    font-size: 12px;
+    color: var(--muted);
 }
 
-.sidebar nav a.activo {
-    background-color: #397b59;
+.sensor.sin-lectura .valor {
+    color: var(--muted);
 }
 
-/* =====================================
-   CONTENIDO PRINCIPAL
-===================================== */
-
-.contenido {
-    flex: 1;
-    min-width: 0;
-    padding: 30px;
+.rango {
+    position: relative;
+    height: 6px;
+    border-radius: 99px;
+    background: var(--sunken);
 }
 
-.contenido > h1 {
-    font-size: 28px;
-    margin-bottom: 28px;
-    color: #244d3a;
+.rango i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 2px solid var(--brand-2);
+    border-right: 2px solid var(--brand-2);
+    background: var(--band);
 }
 
-/* =====================================
-   GRAFICOS
-===================================== */
+.rango b {
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border: 3px solid var(--fg);
+    border-radius: 50%;
+    background: var(--surface);
+    transform: translate(-50%, -50%);
+}
+
+.rango-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.sensor footer {
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* GRAFICOS (106 FR-4) */
 
 .graficos {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-    margin-bottom: 25px;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
-/* =====================================
-   TARJETAS
-===================================== */
-
-.tarjeta {
-    background-color: white;
-    border-radius: 13px;
-    padding: 25px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+.chart .lienzo {
+    position: relative;
+    height: 220px;
 }
 
-.grafico {
-    min-height: 300px;
+.chart .leyenda i {
+    background: var(--band);
 }
 
-.tarjeta h2 {
-    font-size: 20px;
+/* REGISTRO HISTORICO (106 FR-5) */
+
+.tabla .num {
+    text-align: right;
+}
+
+td.num {
+    font-weight: 600;
+}
+
+.aviso-limite,
+.sin-lecturas {
     margin-bottom: 10px;
-    color: #244d3a;
-}
-
-.grafico p {
-    font-size: 14px;
-    color: #777;
-    margin-bottom: 18px;
-}
-
-.grafico canvas {
-    width: 100% !important;
-    height: 210px !important;
-}
-
-/* =====================================
-   REGISTRO HISTORICO
-===================================== */
-
-.historial {
-    width: 100%;
-}
-
-.historial h2 {
-    margin-bottom: 22px;
-}
-
-/* =====================================
-   TABLA
-===================================== */
-
-.tabla-contenedor {
-    width: 100%;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-thead {
-    background-color: #e8f1e9;
-}
-
-th {
-    color: #244d3a;
-    font-weight: bold;
-    padding: 16px 12px;
-    font-size: 14px;
-    border-bottom: 2px solid #dce8dd;
-}
-
-td {
-    padding: 17px 12px;
-    font-size: 14px;
-    border-bottom: 1px solid #e7eee8;
-}
-
-tbody tr:hover {
-    background-color: #f5faf5;
-}
-
-/* =====================================
-   ESTADOS AMBIENTALES
-===================================== */
-
-.estado {
-    display: inline-block;
-    padding: 7px 15px;
-    border-radius: 7px;
     font-size: 13px;
-    font-weight: bold;
-    min-width: 85px;
 }
 
-.calor {
-    background-color: #fce2e2;
-    color: #bd4141;
+.aviso-limite {
+    color: var(--warn-fg);
 }
 
-.en-rango {
-    background-color: #e0f1e4;
-    color: #327448;
+.sin-lecturas {
+    color: var(--muted);
 }
 
-.frio {
-    background-color: #e0edfa;
-    color: #3975ad;
-}
+/* CORTES */
 
-/* =====================================
-   DISEÑO RESPONSIVE
-===================================== */
-
-@media (max-width: 900px) {
+@media (max-width: 980px) {
 
     .graficos {
         grid-template-columns: 1fr;
     }
-
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
 
-    .contenedor {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        min-width: 0;
-        padding: 15px;
-    }
-
-    .sidebar h2 {
-        margin-bottom: 15px;
-    }
-
-    .sidebar nav {
-        flex-direction: row;
+    .estado {
         flex-wrap: wrap;
     }
 
-    .sidebar nav a {
-        font-size: 13px;
-        padding: 10px;
+    .estado small {
+        flex-basis: 100%;
+        margin-left: 21px;
     }
-
-    .contenido {
-        padding: 18px;
-    }
-
-    .contenido > h1 {
-        font-size: 23px;
-    }
-
-    .tarjeta {
-        padding: 17px;
-    }
-
-}
-/* =====================================
-   PANEL DE ALERTAS AMBIENTALES
-===================================== */
-
-.panel-alertas {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.panel-alertas h2 {
-    color: #214d3b;
-    margin-bottom: 18px;
-}
-
-.estado-general {
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-.estado-general.adecuado {
-    background: #e3f1e6;
-    color: #276744;
-    border-left: 5px solid #397b59;
-}
-
-.estado-general.advertencia {
-    background: #fff0df;
-    color: #a65b18;
-    border-left: 5px solid #e49a42;
-}
-
-.indicadores-alerta {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.indicador-alerta {
-    background: #f3f7f3;
-    padding: 20px;
-    border-radius: 12px;
-}
-
-.indicador-alerta h3 {
-    color: #214d3b;
-    margin-bottom: 12px;
-}
-
-.indicador-alerta p {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.indicador-alerta span {
-    color: #397b59;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.estado-alerta.en-rango {
-    color: #397b59;
-}
-
-.estado-alerta.calor,
-.estado-alerta.frio {
-    color: #c16b25;
-}
-
-@media (max-width: 600px) {
-
-    .indicadores-alerta {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-/* =====================================
-   MEJORA VISUAL DE ALERTAS
-===================================== */
-
-.panel-alertas {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-.panel-alertas h2 {
-    color: #214d3b;
-    margin-bottom: 18px;
-}
-
-.estado-general {
-    padding: 15px 18px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-weight: 600;
-    line-height: 1.5;
-}
-
-.estado-general.adecuado {
-    background: #e3f1e6;
-    color: #276744;
-    border-left: 5px solid #397b59;
-}
-
-.estado-general.advertencia {
-    background: #fff0df;
-    color: #a65b18;
-    border-left: 5px solid #e49a42;
-}
-
-.indicadores-alerta {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.indicador-alerta {
-    background: #f3f7f3;
-    padding: 22px;
-    border-radius: 12px;
-    border: 1px solid #e3ebe3;
-}
-
-.indicador-alerta h3 {
-    color: #214d3b;
-    margin: 0 0 14px;
-    font-size: 17px;
-}
-
-.indicador-alerta p.estado-alerta {
-    display: inline-block;
-    width: fit-content;
-    padding: 6px 12px;
-    margin: 0 0 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    background: transparent;
-}
-
-.indicador-alerta p.estado-alerta.en-rango {
-    background: #e0f0e4;
-    color: #276744;
-}
-
-.indicador-alerta p.estado-alerta.calor {
-    background: #fde5df;
-    color: #b5412d;
-}
-
-.indicador-alerta p.estado-alerta.frio {
-    background: #e1edfa;
-    color: #356a9c;
-}
-
-.indicador-alerta span {
-    display: block;
-    color: #214d3b;
-    font-size: 25px;
-    font-weight: 700;
-}
-
-@media (max-width: 600px) {
-
-    .indicadores-alerta {
-        grid-template-columns: 1fr;
-    }
-
 }

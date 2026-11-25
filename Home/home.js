@@ -1,7 +1,18 @@
-
 /* =====================================
-   RELOJ DIGITAL Y ANALOGICO
+   RELOJ DIGITAL Y ANALOGICO (spec 105 FR-3.b, FR-3.c)
 ===================================== */
+
+const dosCifras = numero => String(numero).padStart(2, "0");
+
+// Doce marcas; las de 12, 3, 6 y 9 más largas y gruesas.
+
+document.getElementById("marcasReloj").innerHTML = Array.from({ length: 12 }, (_, i) =>
+    `<line x1="50" y1="8" x2="50" y2="${i % 3 ? 11 : 14}" stroke-width="${i % 3 ? 1.2 : 2.2}"
+        transform="rotate(${i * 30} 50 50)"/>`).join("");
+
+function girar(id, grados) {
+    document.getElementById(id).setAttribute("transform", `rotate(${grados} 50 50)`);
+}
 
 function actualizarReloj() {
 
@@ -11,39 +22,16 @@ function actualizarReloj() {
     const minutos = ahora.getMinutes();
     const segundos = ahora.getSeconds();
 
-    // RELOJ DIGITAL
-
-    const horaFormateada =
-        String(horas).padStart(2, "0") + ":" +
-        String(minutos).padStart(2, "0") + ":" +
-        String(segundos).padStart(2, "0");
-
     document.getElementById("horaActual").textContent =
-        horaFormateada;
+        dosCifras(horas) + ":" + dosCifras(minutos) + ":" + dosCifras(segundos);
 
-    // MANECILLA DE LA HORA
+    document.getElementById("fechaHoy").textContent =
+        formatearFechaLarga(ahora) + " · hora del dispositivo";
 
-    const gradosHora = (horas % 12) * 30 + minutos * 0.5;
-
-    document.getElementById("manecillaHora").style.transform =
-        `translateX(-50%) rotate(${gradosHora}deg)`;
-
-    // MANECILLA DE LOS MINUTOS
-
-    const gradosMinuto = minutos * 6 + segundos * 0.1;
-
-    document.getElementById("manecillaMinuto").style.transform =
-        `translateX(-50%) rotate(${gradosMinuto}deg)`;
-
-    // MANECILLA DE LOS SEGUNDOS
-
-    const gradosSegundo = segundos * 6;
-
-    document.getElementById("manecillaSegundo").style.transform =
-        `translateX(-50%) rotate(${gradosSegundo}deg)`;
+    girar("manecillaHora", (horas % 12) * 30 + minutos * 0.5);
+    girar("manecillaMinuto", minutos * 6 + segundos * 0.1);
+    girar("manecillaSegundo", segundos * 6);
 }
-
-// ACTUALIZAR RELOJ CADA SEGUNDO
 
 actualizarReloj();
 
@@ -51,31 +39,110 @@ setInterval(actualizarReloj, 1000);
 
 
 /* =====================================
-   CALENDARIO DE RIEGO HOME
+   RIEGOS ACTIVOS DEL BACKEND
 ===================================== */
 
-// OBTENER LOS RIEGOS GUARDADOS
-// EN EL CALENDARIO PRINCIPAL
+// { fecha: "2026-11-19", hora: "08:00" }, en hora del invernadero.
 
-function obtenerRiegosHome() {
+let riegosHome = [];
 
-    return JSON.parse(localStorage.getItem("riegos")) || [];
+async function cargarRiegosHome() {
 
+    const entradas = await api("/schedules?active_only=true");
+
+    riegosHome = entradas.map(entrada => ({
+        fecha: entrada.irrigation_date,
+        hora: entrada.irrigation_time.slice(0, 5)
+    }));
+}
+
+// "2026-11-19" de una fecha local.
+
+function fechaIso(fecha) {
+    return fecha.getFullYear() + "-" + dosCifras(fecha.getMonth() + 1) + "-" + dosCifras(fecha.getDate());
 }
 
 
-// ELEMENTOS DEL CALENDARIO
+/* =====================================
+   PROXIMO RIEGO (spec 105 FR-2)
+===================================== */
+
+// Con el reloj del dispositivo (spec D1): "2026-11-19T08:00" sin zona es hora local.
+
+function momentoRiego(riego) {
+    return new Date(riego.fecha + "T" + riego.hora);
+}
+
+function proximoRiego(riegos, ahora) {
+
+    return riegos
+        .filter(riego => momentoRiego(riego) > ahora)
+        .sort((a, b) => momentoRiego(a) - momentoRiego(b))[0] || null;
+}
+
+// "Hoy", "Mañana" o "jueves 19 de noviembre" (FR-2.b).
+
+function textoDia(fecha, ahora) {
+
+    const manana = new Date(ahora);
+    manana.setDate(ahora.getDate() + 1);
+
+    if (fecha === fechaIso(ahora)) {
+        return "Hoy";
+    }
+
+    if (fecha === fechaIso(manana)) {
+        return "Mañana";
+    }
+
+    return formatearFechaLarga(new Date(fecha + "T00:00"));
+}
+
+// Minutos redondeados hacia arriba: nunca dice "Faltan 0 min" (FR-2.c).
+
+function textoFalta(minutos) {
+
+    if (minutos < 60) {
+        return "Faltan " + minutos + " min";
+    }
+
+    if (minutos < 48 * 60) {
+        return "Faltan " + Math.floor(minutos / 60) + " h";
+    }
+
+    return "Faltan " + Math.floor(minutos / 1440) + " días";
+}
+
+// Se recalcula con los riegos ya leídos (plan D6).
+
+function mostrarProximo() {
+
+    const ahora = new Date();
+    const proximo = proximoRiego(riegosHome, ahora);
+    const cuenta = document.getElementById("proxCuenta");
+
+    if (!proximo) {
+        document.getElementById("proxCuando").textContent = "No hay riegos programados.";
+        cuenta.textContent = "";
+        return;
+    }
+
+    document.getElementById("proxCuando").textContent =
+        textoDia(proximo.fecha, ahora) + ", " + proximo.hora;
+
+    cuenta.textContent = textoFalta(Math.ceil((momentoRiego(proximo) - ahora) / 60000));
+}
+
+setInterval(mostrarProximo, 60 * 1000);
+
+
+/* =====================================
+   CALENDARIO DE RIEGO HOME (spec 105 FR-3.a)
+===================================== */
 
 const calendarioHome = document.getElementById("calendarioHome");
 
 const mesActualHome = document.getElementById("mesActualHome");
-
-const botonMesAnterior = document.getElementById("mesAnteriorHome");
-
-const botonMesSiguiente = document.getElementById("mesSiguienteHome");
-
-
-// FECHA ACTUAL
 
 const fechaHoy = new Date();
 
@@ -83,171 +150,173 @@ let mesHome = fechaHoy.getMonth();
 
 let anioHome = fechaHoy.getFullYear();
 
-
-// NOMBRES DE LOS MESES
-
 const nombresMeses = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre"
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
-/* =====================================
-   MOSTRAR CALENDARIO
-===================================== */
+function crearCelda(texto, clases) {
+
+    const celda = document.createElement("div");
+    celda.className = clases;
+    celda.textContent = texto;
+    return celda;
+}
 
 function mostrarCalendarioHome() {
 
-    calendarioHome.innerHTML = "";
+    mesActualHome.textContent = nombresMeses[mesHome] + " " + anioHome;
 
-    // MOSTRAR MES Y AÑO
+    const celdas = DIAS_SEMANA.map(dia => crearCelda(dia, "dow"));
 
-    mesActualHome.textContent =
-        nombresMeses[mesHome] + " " + anioHome;
+    // La semana empieza el lunes.
 
+    const espacios = (new Date(anioHome, mesHome, 1).getDay() + 6) % 7;
 
-    // PRIMER DIA DEL MES
-
-    const primerDia = new Date(anioHome, mesHome, 1);
-
-    // CANTIDAD DE DIAS DEL MES
-
-    const cantidadDias = new Date(
-        anioHome,
-        mesHome + 1,
-        0
-    ).getDate();
-
-
-    // AJUSTAR SEMANA PARA COMENZAR EL LUNES
-
-    let diaSemana = primerDia.getDay();
-
-    diaSemana = (diaSemana + 6) % 7;
-
-
-    // ESPACIOS VACIOS
-
-    for (let i = 0; i < diaSemana; i++) {
-
-        const espacio = document.createElement("div");
-
-        espacio.classList.add("dia-home", "vacio");
-
-        calendarioHome.appendChild(espacio);
-
+    for (let i = 0; i < espacios; i++) {
+        celdas.push(crearCelda("", "dia vacio"));
     }
 
-
-    // OBTENER RIEGOS GUARDADOS
-
-    const riegosHome = obtenerRiegosHome();
-
-
-    // CREAR LOS DIAS DEL MES
+    const cantidadDias = new Date(anioHome, mesHome + 1, 0).getDate();
+    const hoy = fechaIso(fechaHoy);
 
     for (let dia = 1; dia <= cantidadDias; dia++) {
 
-        const elementoDia = document.createElement("div");
+        const fecha = fechaIso(new Date(anioHome, mesHome, dia));
+        const celda = crearCelda(dia, "dia");
 
-        elementoDia.classList.add("dia-home");
+        celda.classList.toggle("hoy", fecha === hoy);
+        celda.classList.toggle("pasado", fecha < hoy);
 
-        elementoDia.textContent = dia;
-
-
-        // CREAR FECHA COMPLETA
-
-        const fechaCompleta =
-            anioHome + "-" +
-            String(mesHome + 1).padStart(2, "0") + "-" +
-            String(dia).padStart(2, "0");
-
-
-        // COMPROBAR SI EXISTE UN RIEGO PROGRAMADO
-
-        if (riegosHome.some(riego => riego.fecha === fechaCompleta)) {
-
-            elementoDia.classList.add("riego");
-
-            elementoDia.title = "Día programado para riego";
-
+        if (riegosHome.some(riego => riego.fecha === fecha)) {
+            celda.classList.add("riego");
+            celda.title = "Día programado para riego";
         }
 
-
-        // COMPROBAR SI ES EL DIA ACTUAL
-
-        if (
-            dia === fechaHoy.getDate() &&
-            mesHome === fechaHoy.getMonth() &&
-            anioHome === fechaHoy.getFullYear()
-        ) {
-
-            elementoDia.classList.add("hoy");
-
-        }
-
-
-        calendarioHome.appendChild(elementoDia);
-
+        celdas.push(celda);
     }
 
+    calendarioHome.replaceChildren(...celdas);
 }
 
-
-/* =====================================
-   CAMBIAR MES ANTERIOR
-===================================== */
-
-botonMesAnterior.addEventListener("click", function() {
+document.getElementById("mesAnteriorHome").addEventListener("click", function() {
 
     mesHome--;
 
     if (mesHome < 0) {
-
         mesHome = 11;
-
         anioHome--;
-
     }
 
     mostrarCalendarioHome();
-
 });
 
-
-/* =====================================
-   CAMBIAR MES SIGUIENTE
-===================================== */
-
-botonMesSiguiente.addEventListener("click", function() {
+document.getElementById("mesSiguienteHome").addEventListener("click", function() {
 
     mesHome++;
 
     if (mesHome > 11) {
-
         mesHome = 0;
-
         anioHome++;
-
     }
 
     mostrarCalendarioHome();
-
 });
+
+mostrarCalendarioHome();
+
+cargarRiegosHome()
+    .then(() => {
+        mostrarCalendarioHome();
+        mostrarProximo();
+    })
+    .catch(error => console.error("No se pudieron cargar los riegos:", error));
 
 
 /* =====================================
-   INICIAR CALENDARIO
+   TEMPERATURA Y HUMEDAD ACTUALES (spec 101 FR-5, 105 FR-1)
 ===================================== */
 
-mostrarCalendarioHome();
+// Con varios sensores del mismo tipo, la lectura más reciente es la
+// mejor respuesta a "¿cómo está ahora?" (spec 101 D3); su estado y su
+// rango son los de ese mismo sensor (105 D5).
+
+function lecturaMasReciente(condiciones, tipo) {
+
+    return condiciones
+        .filter(sensor => sensor.type === tipo && sensor.value !== null)
+        .sort((a, b) => Date.parse(b.recorded_at) - Date.parse(a.recorded_at))[0];
+}
+
+// Las clases de estadoLectura() son las de Datos; Home usa los chips de 104.
+
+const CHIP_ESTADO = { "en-rango": "ok", calor: "hot", frio: "cold" };
+
+// "Ideal 18–24 °C", "Ideal hasta 24 °C", "Ideal desde 18 °C" o "Sin límites" (FR-1.b, FR-1.c).
+
+function textoRango(sensor) {
+
+    const minimo = sensor.min_val != null ? formatearNumero(sensor.min_val) : null;
+    const maximo = sensor.max_val != null ? formatearNumero(sensor.max_val) : null;
+
+    if (minimo !== null && maximo !== null) {
+        return "Ideal " + minimo + "–" + maximo + " " + sensor.unit;
+    }
+
+    if (maximo !== null) {
+        return "Ideal hasta " + maximo + " " + sensor.unit;
+    }
+
+    if (minimo !== null) {
+        return "Ideal desde " + minimo + " " + sensor.unit;
+    }
+
+    return "Sin límites";
+}
+
+function mostrarLectura(lectura, idValor, idEstado, idDetalle) {
+
+    const estado = document.getElementById(idEstado);
+
+    if (!lectura) {
+        document.getElementById(idValor).textContent = "--";
+        estado.className = "chip none";
+        estado.textContent = "Sin lecturas";
+        document.getElementById(idDetalle).textContent = "";
+        return;
+    }
+
+    const resultado = estadoLectura(lectura.value, lectura);
+
+    document.getElementById(idValor).textContent = formatearNumero(lectura.value);
+    estado.className = "chip " + CHIP_ESTADO[resultado.clase];
+    estado.textContent = resultado.texto;
+    document.getElementById(idDetalle).textContent =
+        textoRango(lectura) + " · " + antiguedad(lectura.recorded_at, new Date());
+}
+
+function mostrarCondicionesHome(condiciones) {
+
+    mostrarLectura(lecturaMasReciente(condiciones, "temperature"),
+        "temperatura", "estadoTemperatura", "detalleTemperatura");
+
+    mostrarLectura(lecturaMasReciente(condiciones, "humidity"),
+        "humedad", "estadoHumedad", "detalleHumedad");
+}
+
+// Si la consulta falla se conservan los valores mostrados.
+
+async function cargarCondicionesHome() {
+
+    try {
+        mostrarCondicionesHome(await api("/conditions"));
+    } catch (error) {
+        console.error("No se pudieron leer las condiciones:", error);
+    }
+}
+
+cargarCondicionesHome();
+
+setInterval(cargarCondicionesHome, 30 * 1000);

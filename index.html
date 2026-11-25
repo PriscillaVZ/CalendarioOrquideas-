@@ -6,177 +6,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Calendario de Riego</title>
+    <!-- Tipografías del rediseño; sin red, las del sistema (spec 104 FR-1.c) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+
 
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-    <div class="contenedor">
+    <div class="app">
 
-        <!-- MENU LATERAL -->
-        <aside class="menu-lateral">
+        <!-- BARRA LATERAL (spec 104 FR-2) -->
+        <aside class="sidebar">
 
-            <h2>Orquídeas</h2>
+            <div class="logo">
+                <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+                    <g fill="#e7a9d6">
+                        <ellipse cx="16" cy="8" rx="5" ry="7"/>
+                        <ellipse cx="8" cy="15" rx="7" ry="4.5" transform="rotate(-20 8 15)"/>
+                        <ellipse cx="24" cy="15" rx="7" ry="4.5" transform="rotate(20 24 15)"/>
+                    </g>
+                    <path d="M12 20c1 5 7 5 8 0-2 2-6 2-8 0z" fill="#fff"/>
+                    <circle cx="16" cy="16" r="2.5" fill="#f6d77a"/>
+                </svg>
+                <span>Orquídeas</span>
+            </div>
 
-            <nav>
-                 <a href="Home/home.html">Home</a>
-
-                 <a href="Datos/datos.html">Datos</a>
-
-                 <a href="index.html" class="activo">Calendario de Riego</a>
-
-                 <a href="Configuracion/configuracion.html"> Configuración</a>
+            <nav aria-label="Páginas">
+                <a href="Home/home.html">Home</a>
+                <a href="Datos/datos.html">Datos</a>
+                <a href="index.html" class="activo" aria-current="page">Calendario de Riego</a>
+                <a href="Configuracion/configuracion.html">Configuración</a>
             </nav>
+
+            <button type="button" class="salir">Cerrar sesión</button>
 
         </aside>
 
-
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="contenido">
+        <main>
+        <div class="wrap">
 
-            <header class="encabezado">
-
-                <h1>Calendario de Riego</h1>
-
-                <div class="perfil">
-                    <span>👤</span>
+            <!-- ENCABEZADO (spec 104 FR-3); la campana la pone notificaciones.js -->
+            <header class="head">
+                <div>
+                    <h1>Calendario de riego</h1>
+                    <p>Programa, edita o elimina los riegos de tus orquídeas</p>
                 </div>
-
+                <div class="head-tools">
+                    <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+                </div>
             </header>
 
 
-            <!-- SECCION DEL CALENDARIO -->
-            <section class="contenido-calendario">
+            <!-- CALENDARIO Y PROXIMOS RIEGOS (spec 105 FR-4, FR-5) -->
+            <section class="cal-layout">
 
-                <div class="calendario">
+                <div class="panel">
 
-                    <div class="calendario-encabezado">
-
-                        <h2>Calendario de Riego</h2>
-
-                        <div class="navegacion-mes">
-
-                            <button id="mesAnterior">&lt;</button>
-
-                            <h3 id="mesActual"></h3>
-
-                            <button id="mesSiguiente">&gt;</button>
-
+                    <div class="panel-head">
+                        <h2 id="mesActual"></h2>
+                        <div class="mes-nav">
+                            <button id="mesAnterior" type="button" aria-label="Mes anterior">‹</button>
+                            <button id="mesHoy" class="btn" type="button">Hoy</button>
+                            <button id="mesSiguiente" type="button" aria-label="Mes siguiente">›</button>
                         </div>
-
                     </div>
 
+                    <div id="calendario" class="cal cal-grande"></div>
 
-                    <!-- DIAS DE LA SEMANA -->
-                    <div class="dias-semana">
-
-                        <div>Lun</div>
-                        <div>Mar</div>
-                        <div>Mié</div>
-                        <div>Jue</div>
-                        <div>Vie</div>
-                        <div>Sáb</div>
-                        <div>Dom</div>
-
-                    </div>
-
-
-                    <!-- DIAS DEL MES -->
-                    <div id="diasCalendario" class="dias-calendario">
-
-                    </div>
+                    <p class="leyenda">Toca un día para programar, editar o eliminar un riego.</p>
 
                 </div>
 
+                <div class="panel">
 
-                <!-- PANEL DE PROXIMOS RIEGOS -->
-                <div class="proximos-riegos">
-
-                    <h2>Próximos riegos</h2>
-
-                    <div id="listaRiegos">
-
-                        <p>No hay riegos programados.</p>
-
+                    <div class="panel-head">
+                        <h2>Próximos riegos</h2>
+                        <small id="cuentaRiegos"></small>
                     </div>
+
+                    <ul id="proximosRiegos" class="lista-riegos"></ul>
 
                 </div>
 
             </section>
 
 
-            <!-- VENTANA PARA PROGRAMAR EL RIEGO -->
-            <div id="modalRiego" class="modal">
+            <!-- VENTANA DE UN DIA (spec 105 FR-6) -->
+            <dialog id="dlgRiego" aria-labelledby="tituloRiego">
 
-                <div class="modal-contenido">
+                <!-- novalidate: la hora vacía la avisa la ventana, no el navegador (FR-6.e) -->
+                <form id="formRiego" novalidate>
 
-                    <!-- ENCABEZADO DEL MODAL -->
-                    <div class="modal-encabezado">
-
-                        <h2>Programar riego</h2>
-
-                        <button
-                            id="cerrarModal"
-                            class="cerrar-modal"
-                            type="button">
-                            &times;
-                        </button>
-
+                    <div class="dlg-head">
+                        <div>
+                            <h2 id="tituloRiego">Programar riego</h2>
+                            <p id="dlgFecha"></p>
+                        </div>
+                        <button id="cerrarRiego" class="cerrar" type="button" aria-label="Cerrar">×</button>
                     </div>
 
+                    <div id="riegosDia" hidden>
+                        <p class="ayuda">Ya programados este día (toca uno para editarlo):</p>
+                        <div id="chipsDia" class="chips-dia"></div>
+                    </div>
 
-                    <!-- FECHA SELECCIONADA -->
-                    <p id="fechaSeleccionada"></p>
-
-
-                    <!-- SELECCIONAR HORA -->
-                    <label for="horaRiego">
-                        Seleccionar hora de riego:
+                    <label class="field">
+                        Hora de riego
+                        <input type="time" id="horaRiego">
                     </label>
 
-                    <input
-                        type="time"
-                        id="horaRiego"
-                    >
+                    <p id="mensajeRiego" class="mensaje-error" role="alert" hidden></p>
 
-
-                    <!-- BOTONES DEL MODAL -->
-                    <div class="modal-botones">
-
-                        <button
-                            id="eliminarRiego"
-                            class="btn-eliminar"
-                            type="button">
-                            Eliminar
-                        </button>
-
-                        <button
-                            id="cancelarRiego"
-                            class="btn-cancelar"
-                            type="button">
-                            Cancelar
-                        </button>
-
-                        <button
-                            id="guardarRiego"
-                            class="btn-guardar"
-                            type="button">
-                            Guardar riego
-                        </button>
-
+                    <div class="dlg-foot">
+                        <button id="eliminarRiego" class="btn danger" type="button" hidden>Eliminar</button>
+                        <button id="cancelarRiego" class="btn" type="button">Cancelar</button>
+                        <button id="guardarRiego" class="btn primary" type="submit">Guardar riego</button>
                     </div>
 
-                </div>
+                </form>
 
-            </div>
+            </dialog>
 
+        </div>
         </main>
 
     </div>
 
 
     <!-- ARCHIVO JAVASCRIPT -->
+    <script src="api.js"></script>
+
+    <script src="notificaciones.js"></script>
+
     <script src="calendario.js"></script>
 
 </body>

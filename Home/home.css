@@ -1,484 +1,136 @@
-
 /* =====================================
-   ESTILOS GENERALES DE HOME
+   HOME (spec 105 FR-1 a FR-3)
+   El calendario compartido vive en styles.css (plan D5).
 ===================================== */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+.home-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.1fr;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f7f3;
-    color: #244d3a;
-}
+/* LECTURAS */
 
-/* =====================================
-   CONTENEDOR PRINCIPAL
-===================================== */
-
-.contenedor {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-}
-
-/* =====================================
-   MENU LATERAL
-===================================== */
-
-.menu-lateral {
-    width: 232px;
-    min-width: 232px;
-    background-color: #214d3b;
-    color: white;
-    padding: 22px 17px;
-}
-
-.menu-lateral h2 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 40px;
-}
-
-.menu-lateral nav {
+.lectura {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-
-.menu-lateral nav a {
-    display: block;
-    text-decoration: none;
-    color: white;
-    padding: 14px 13px;
-    border-radius: 9px;
-    font-size: 15px;
-    transition: background-color 0.2s ease;
-}
-
-.menu-lateral nav a:hover {
-    background-color: #32694e;
-}
-
-.menu-lateral nav a.activo {
-    background-color: #397b59;
-}
-
-/* =====================================
-   CONTENIDO PRINCIPAL
-===================================== */
-
-.contenido {
-    flex: 1;
-    min-width: 0;
-    padding: 30px;
-}
-
-/* =====================================
-   ENCABEZADO
-===================================== */
-
-.encabezado {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.encabezado h1 {
-    font-size: 28px;
-    color: #244d3a;
-}
-
-.perfil {
-    width: 46px;
-    height: 46px;
-    background-color: #e0eee2;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-}
-
-/* =====================================
-   INDICADORES DE TEMPERATURA Y HUMEDAD
-===================================== */
-
-.indicadores-home {
-    background-color: white;
-    border-radius: 15px;
-    padding: 30px;
-    min-height: 165px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-    max-width: 700px;
-}
-
-.indicador {
-    text-align: center;
-    flex: 1;
-}
-
-.indicador-dato {
-    color: #39975a;
-    font-size: 52px;
-    font-weight: bold;
-}
-
-.indicador p {
-    color: #777;
-    font-size: 14px;
-    margin-top: 8px;
-}
-
-.separador {
-    width: 1px;
-    height: 85px;
-    background-color: #e1e9e1;
-}
-
-/* =====================================
-   DESCRIPCION
-===================================== */
-
-.descripcion-home {
-    color: #777;
-    font-size: 14px;
-    margin-top: 13px;
-    margin-bottom: 30px;
-}
-
-/* =====================================
-   SECCION INFERIOR
-===================================== */
-
-.seccion-inferior {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 25px;
-    align-items: stretch;
-}
-
-/* =====================================
-   TARJETAS HOME
-===================================== */
-
-.tarjeta-home {
-    background-color: white;
-    border-radius: 13px;
-    padding: 25px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-}
-
-.tarjeta-home h2 {
-    font-size: 21px;
-    color: #244d3a;
-}
-
-/* =====================================
-   CALENDARIO
-===================================== */
-
-.titulo-tarjeta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    margin-bottom: 22px;
 }
 
-.titulo-tarjeta a {
-    color: #397b59;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.titulo-tarjeta a:hover {
-    text-decoration: underline;
-}
-
-.mes-home {
+.lectura .row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.mes-home h3 {
-    font-size: 17px;
-    color: #244d3a;
-}
-
-.mes-home button {
-    border: none;
-    background-color: #214d3b;
-    color: white;
-    width: 32px;
-    height: 32px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.mes-home button:hover {
-    background-color: #397b59;
-}
-
-/* DIAS DE LA SEMANA */
-
-.dias-semana-home {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    margin-bottom: 10px;
-    gap: 5px;
-}
-
-.dias-semana-home span {
-    font-size: 12px;
-    font-weight: bold;
-    color: #244d3a;
-}
-
-/* DIAS DEL MES */
-
-.dias-mes-home {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 7px;
-}
-
-.dia-home {
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 7px;
-    font-size: 13px;
-    color: #244d3a;
-    background-color: #f8faf8;
-    border: 1px solid #e6eee6;
-}
-
-.dia-home.vacio {
-    background-color: transparent;
-    border: none;
-}
-
-.dia-home.riego {
-    color: #ffffff;
-    background-color: #397b59;
-    font-weight: bold;
-}
-
-.dia-home.hoy {
-    border: 2px solid #397b59;
-    font-weight: bold;
-}
-
-/* LEYENDA */
-
-.leyenda-riego {
-    display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 17px;
-    color: #777;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.lectura .valor {
+    font-size: 48px;
+}
+
+.lectura small {
+    color: var(--muted);
     font-size: 12px;
 }
 
-.leyenda-riego span {
-    width: 11px;
-    height: 11px;
-    background-color: #397b59;
-    border-radius: 50%;
+/* PROXIMO RIEGO */
+
+.proximo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--brand-2);
+    border-color: var(--brand-2);
+    color: var(--on-brand);
 }
 
-/* =====================================
-   RELOJ
-===================================== */
+.proximo .eyebrow {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+}
 
-.reloj-home {
+.proximo .cuando {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.proximo .cuenta {
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.proximo a {
+    margin-top: auto;
+    color: inherit;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* CALENDARIO Y RELOJ */
+
+.home-bottom {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 14px;
+}
+
+.reloj {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 14px;
+    text-align: center;
 }
 
-.reloj-home h2 {
-    margin-bottom: 15px;
+.reloj svg {
+    width: 150px;
+    height: 150px;
 }
 
-.hora-actual {
-    font-size: 28px;
-    font-weight: bold;
-    color: #397b59;
-    margin-bottom: 20px;
+.reloj .hora {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }
 
-/* RELOJ ANALOGICO */
-
-.reloj-analogico {
-    width: 220px;
-    height: 220px;
-    border: 7px solid #214d3b;
-    border-radius: 50%;
-    position: relative;
-    background-color: #ffffff;
-    box-shadow: inset 0 0 0 3px #dce9df;
+.reloj small {
+    color: var(--muted);
+    font-size: 13px;
 }
 
-/* NUMEROS DEL RELOJ */
+/* CORTES */
 
-.marca-reloj {
-    position: absolute;
-    font-size: 15px;
-    font-weight: bold;
-    color: #244d3a;
+@media (max-width: 980px) {
+
+    .home-top {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .proximo {
+        grid-column: 1 / -1;
+    }
+
+    .home-bottom {
+        grid-template-columns: 1fr;
+    }
 }
 
-.marca-12 {
-    top: 9px;
-    left: 50%;
-    transform: translateX(-50%);
-}
+@media (max-width: 640px) {
 
-.marca-3 {
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.marca-6 {
-    bottom: 9px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.marca-9 {
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-/* MANECILLAS */
-
-.manecilla {
-    position: absolute;
-    bottom: 50%;
-    left: 50%;
-    transform-origin: bottom center;
-    border-radius: 10px;
-}
-
-.manecilla.hora {
-    width: 5px;
-    height: 55px;
-    background-color: #214d3b;
-    z-index: 2;
-}
-
-.manecilla.minuto {
-    width: 3px;
-    height: 75px;
-    background-color: #397b59;
-    z-index: 3;
-}
-
-.manecilla.segundo {
-    width: 2px;
-    height: 82px;
-    background-color: #d45b5b;
-    z-index: 4;
-}
-
-/* CENTRO DEL RELOJ */
-
-.centro-reloj {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: #214d3b;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-}
-
-.reloj-home > p {
-    color: #888;
-    font-size: 12px;
-    margin-top: 17px;
-}
-
-/* =====================================
-   RESPONSIVE
-===================================== */
-
-@media (max-width: 950px) {
-
-    .seccion-inferior {
+    .home-top {
         grid-template-columns: 1fr;
     }
 
-}
-
-@media (max-width: 600px) {
-
-    .contenedor {
-        flex-direction: column;
+    .lectura .valor {
+        font-size: 40px;
     }
-
-    .menu-lateral {
-        width: 100%;
-        min-width: 0;
-        padding: 15px;
-    }
-
-    .menu-lateral h2 {
-        margin-bottom: 15px;
-    }
-
-    .menu-lateral nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .menu-lateral nav a {
-        font-size: 12px;
-        padding: 10px;
-    }
-
-    .contenido {
-        padding: 18px;
-    }
-
-    .encabezado h1 {
-        font-size: 23px;
-    }
-
-    .indicadores-home {
-        padding: 20px 10px;
-    }
-
-    .indicador-dato {
-        font-size: 36px;
-    }
-
-    .tarjeta-home {
-        padding: 17px;
-    }
-
-    .reloj-analogico {
-        width: 190px;
-        height: 190px;
-    }
-
 }

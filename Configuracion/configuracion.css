@@ -1,356 +1,159 @@
-
 /* =====================================
-   ESTILOS GENERALES
+   CONFIGURACION (spec 102, 107)
+   Ventana, campos, botones y chips vienen de styles.css (104).
 ===================================== */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+#mensajeSensores,
+.clave {
+    margin-bottom: 12px;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f3f7f3;
-    color: #244d3a;
-}
+/* FILAS DE SENSOR (107 FR-1) */
 
-/* =====================================
-   CONTENEDOR PRINCIPAL
-===================================== */
-
-.contenedor {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-}
-
-/* =====================================
-   MENU LATERAL
-===================================== */
-
-.menu-lateral {
-    width: 232px;
-    min-width: 232px;
-    background-color: #214d3b;
-    color: white;
-    padding: 22px 17px;
-}
-
-.menu-lateral h2 {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 40px;
-}
-
-.menu-lateral nav {
+.filas-sensor {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+}
+
+.sin-sensores {
+    color: var(--muted);
+}
+
+.fila-sensor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.fila-sensor.apagado {
+    opacity: 0.65;
+}
+
+.fila-sensor h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.fila-sensor h3 .id {
+    color: var(--muted);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.acciones .btn {
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.revisar {
+    grid-column: 1 / -1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--warn-bg);
+    color: var(--warn-fg);
+    font-size: 13px;
+}
+
+.revisar ul {
+    margin-top: 4px;
+    padding-left: 18px;
+}
+
+/* CLAVE (107 FR-3) */
+
+.clave {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border: 1px dashed var(--brand-2);
+    border-radius: 12px;
+    background: var(--sunken);
+}
+
+.clave-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.clave code {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.clave small {
+    color: var(--muted);
+}
+
+/* VENTANA (107 FR-2) */
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-.menu-lateral nav a {
-    display: block;
-    text-decoration: none;
-    color: white;
-    padding: 14px 13px;
-    border-radius: 9px;
-    font-size: 15px;
-    transition: background-color 0.2s ease;
-}
-
-.menu-lateral nav a:hover {
-    background-color: #32694e;
-}
-
-.menu-lateral nav a.activo {
-    background-color: #397b59;
-}
-
-/* =====================================
-   CONTENIDO PRINCIPAL
-===================================== */
-
-.contenido {
-    flex: 1;
+/* Un input de número tiene un ancho mínimo propio: sin esto, dos en fila
+   desbordan la ventana */
+.field-row .field,
+.field-row input {
     min-width: 0;
-    padding: 30px;
 }
 
-/* =====================================
-   ENCABEZADO
-===================================== */
-
-.encabezado {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+/* Tipo y conexión no cambian al editar (102 FR-4.b): que se note */
+.field select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-.encabezado h1 {
-    font-size: 28px;
-    color: #244d3a;
-}
+/* CORTES */
 
-.perfil {
-    width: 46px;
-    height: 46px;
-    background-color: #e0eee2;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 23px;
-}
+@media (max-width: 720px) {
 
-/* =====================================
-   TARJETAS DE CONFIGURACION
-===================================== */
-
-.tarjeta-configuracion {
-    background-color: white;
-    border-radius: 13px;
-    padding: 25px;
-    margin-bottom: 24px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
-}
-
-.titulo-configuracion {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 22px;
-}
-
-.titulo-configuracion h2 {
-    font-size: 20px;
-    color: #244d3a;
-    margin-bottom: 9px;
-}
-
-.titulo-configuracion p {
-    color: #777;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* =====================================
-   ICONOS
-===================================== */
-
-.icono-sensor,
-.icono-seccion {
-    width: 55px;
-    height: 55px;
-    min-width: 55px;
-    background-color: #e8f1e9;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-}
-
-.informacion-sensor {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 22px;
-}
-
-.informacion-sensor h3 {
-    font-size: 16px;
-    margin-bottom: 6px;
-    color: #244d3a;
-}
-
-.informacion-sensor p {
-    color: #888;
-    font-size: 13px;
-}
-
-/* =====================================
-   ESTADO DE CONEXION
-===================================== */
-
-.estado-conexion {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.indicador-conexion {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-}
-
-.estado-conexion.conectado {
-    color: #327448;
-    background-color: #e0f1e4;
-}
-
-.estado-conexion.conectado .indicador-conexion {
-    background-color: #39975a;
-}
-
-.estado-conexion.desconectado {
-    color: #bd4141;
-    background-color: #fce2e2;
-}
-
-.estado-conexion.desconectado .indicador-conexion {
-    background-color: #d9534f;
-}
-
-/* =====================================
-   BOTONES
-===================================== */
-
-.btn-principal {
-    display: inline-block;
-    border: none;
-    background-color: #214d3b;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.btn-principal:hover {
-    background-color: #397b59;
-}
-
-.enlace-boton {
-    text-align: center;
-}
-
-/* =====================================
-   FORMULARIO DE FRECUENCIA
-===================================== */
-
-.formulario-frecuencia {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 13px;
-}
-
-.formulario-frecuencia label {
-    font-size: 14px;
-    font-weight: bold;
-    color: #244d3a;
-}
-
-.formulario-frecuencia select {
-    width: 100%;
-    max-width: 400px;
-    padding: 13px;
-    border: 1px solid #dce8dd;
-    border-radius: 8px;
-    background-color: #f8faf8;
-    color: #244d3a;
-    font-size: 14px;
-    outline: none;
-    cursor: pointer;
-}
-
-.formulario-frecuencia select:focus {
-    border-color: #397b59;
-}
-
-/* =====================================
-   MENSAJES
-===================================== */
-
-.mensaje {
-    font-size: 13px;
-    color: #327448;
-    font-weight: bold;
-}
-
-/* =====================================
-   RESPONSIVE
-===================================== */
-
-@media (max-width: 700px) {
-
-    .contenedor {
-        flex-direction: column;
+    .fila-sensor {
+        grid-template-columns: 1fr;
     }
 
-    .menu-lateral {
-        width: 100%;
-        min-width: 0;
-        padding: 15px;
+    .acciones {
+        justify-content: flex-start;
     }
 
-    .menu-lateral h2 {
-        margin-bottom: 15px;
+    .field-row {
+        grid-template-columns: 1fr;
     }
-
-    .menu-lateral nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .menu-lateral nav a {
-        font-size: 12px;
-        padding: 10px;
-    }
-
-    .contenido {
-        padding: 18px;
-    }
-
-    .encabezado h1 {
-        font-size: 23px;
-    }
-
-    .tarjeta-configuracion {
-        padding: 18px;
-    }
-
-    .titulo-configuracion {
-        align-items: flex-start;
-    }
-
-    .estado-conexion {
-        font-size: 11px;
-        padding: 7px;
-    }
-
-}
-
-/* =====================================
-   MENSAJES DE CONFIGURACION
-===================================== */
-
-.mensaje-exito {
-    color: #276744;
-    background: #e3f1e6;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-weight: 600;
-}
-
-.mensaje-error {
-    color: #a63d32;
-    background: #fde5df;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-weight: 600;
 }

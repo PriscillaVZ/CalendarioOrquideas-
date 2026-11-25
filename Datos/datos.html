@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datos - Orquídeas</title>
+    <!-- Tipografías del rediseño; sin red, las del sistema (spec 104 FR-1.c) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+
 
     <!-- Estilos generales -->
     <link rel="stylesheet" href="../styles.css">
@@ -15,135 +20,140 @@
 
 <body>
 
-    <div class="contenedor">
+    <div class="app">
 
-        <!-- BARRA LATERAL -->
+        <!-- BARRA LATERAL (spec 104 FR-2) -->
         <aside class="sidebar">
 
-            <h2>Orquídeas</h2>
+            <div class="logo">
+                <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+                    <g fill="#e7a9d6">
+                        <ellipse cx="16" cy="8" rx="5" ry="7"/>
+                        <ellipse cx="8" cy="15" rx="7" ry="4.5" transform="rotate(-20 8 15)"/>
+                        <ellipse cx="24" cy="15" rx="7" ry="4.5" transform="rotate(20 24 15)"/>
+                    </g>
+                    <path d="M12 20c1 5 7 5 8 0-2 2-6 2-8 0z" fill="#fff"/>
+                    <circle cx="16" cy="16" r="2.5" fill="#f6d77a"/>
+                </svg>
+                <span>Orquídeas</span>
+            </div>
 
-            <nav>
+            <nav aria-label="Páginas">
                 <a href="../Home/home.html">Home</a>
-
-                <a href="datos.html" class="activo">Datos</a>
-
+                <a href="../Datos/datos.html" class="activo" aria-current="page">Datos</a>
                 <a href="../index.html">Calendario de Riego</a>
-
-                <a href="../Configuracion/configuracion.html">
-                    Configuración
-                </a>
+                <a href="../Configuracion/configuracion.html">Configuración</a>
             </nav>
+
+            <button type="button" class="salir">Cerrar sesión</button>
 
         </aside>
 
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="contenido">
+        <main>
+        <div class="wrap">
 
-            <h1>Datos Ambientales</h1>
-
-            <!-- ALERTAS AMBIENTALES -->
-            <section class="panel-alertas">
-
-                <h2>Estado del ambiente</h2>
-
-                <div id="estadoGeneral" class="estado-general">
-                    Evaluando condiciones ambientales...
+            <!-- ENCABEZADO (spec 104 FR-3); la campana la pone notificaciones.js -->
+            <header class="head">
+                <div>
+                    <h1>Datos ambientales</h1>
+                    <p>Lecturas de tus sensores</p>
                 </div>
-
-                <div class="indicadores-alerta">
-
-                    <!-- HUMEDAD -->
-                    <div class="indicador-alerta">
-
-                        <h3>Humedad ambiental</h3>
-
-                        <p id="alertaHumedad">--</p>
-
-                        <span id="valorHumedad">-- %</span>
-
+                <div class="head-tools">
+                    <!-- PERIODO DE GRAFICOS Y TABLA (spec 106 FR-2) -->
+                    <div class="periodo" role="group" aria-label="Periodo">
+                        <button id="p24" type="button" aria-pressed="true" data-horas="24">24 horas</button>
+                        <button id="p168" type="button" aria-pressed="false" data-horas="168">7 días</button>
                     </div>
-
-                    <!-- TEMPERATURA -->
-                    <div class="indicador-alerta">
-
-                        <h3>Temperatura ambiental</h3>
-
-                        <p id="alertaTemperatura">--</p>
-
-                        <span id="valorTemperatura">-- °C</span>
-
-                    </div>
-
+                    <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
                 </div>
+            </header>
 
-            </section>
+            <!-- ESTADO GENERAL (spec 106 FR-1) -->
+            <div id="estadoGeneral" class="estado none" role="status">
+                <span class="pulse"></span>
+                <span id="textoEstado">Evaluando condiciones ambientales...</span>
+                <small id="antiguedad"></small>
+            </div>
+
+            <!-- Mensaje cuando el backend no responde o rechaza -->
+            <p id="avisoDatos" class="aviso-datos" role="status" hidden></p>
+
+            <!-- UNA TARJETA POR SENSOR ACTIVO (spec 106 FR-3) -->
+            <section id="tarjetasSensores" class="sensores"></section>
 
 
-            <!-- GRAFICOS -->
+            <!-- GRAFICOS: UNO POR TIPO, CON EL RANGO IDEAL (spec 106 FR-4) -->
             <section class="graficos">
 
-                <div class="tarjeta grafico">
-
-                    <h2>Humedad Ambiental</h2>
-
-                    <p>Registro de humedad (%)</p>
-
-                    <canvas id="graficoHumedad"></canvas>
-
+                <div class="panel chart">
+                    <div class="panel-head">
+                        <h2>Humedad</h2>
+                        <small class="per" data-unidad="%"></small>
+                    </div>
+                    <div class="lienzo">
+                        <canvas id="graficoHumedad" role="img" data-nombre="Humedad"></canvas>
+                    </div>
+                    <p class="leyenda" id="leyendaHum" hidden><i></i> Rango ideal</p>
                 </div>
 
-
-                <div class="tarjeta grafico">
-
-                    <h2>Temperatura Ambiental</h2>
-
-                    <p>Registro de temperatura (°C)</p>
-
-                    <canvas id="graficoTemperatura"></canvas>
-
+                <div class="panel chart">
+                    <div class="panel-head">
+                        <h2>Temperatura</h2>
+                        <small class="per" data-unidad="°C"></small>
+                    </div>
+                    <div class="lienzo">
+                        <canvas id="graficoTemperatura" role="img" data-nombre="Temperatura"></canvas>
+                    </div>
+                    <p class="leyenda" id="leyendaTemp" hidden><i></i> Rango ideal</p>
                 </div>
 
             </section>
 
 
-            <!-- REGISTRO HISTORICO -->
-            <section class="tarjeta historial">
+            <!-- REGISTRO HISTORICO (spec 106 FR-5) -->
+            <section class="panel">
 
-                <h2>Registro Histórico de Condiciones Ambientales</h2>
+                <div class="panel-head">
+                    <h2>Registro histórico</h2>
+                    <small id="conteo"></small>
+                </div>
 
-                <div class="tabla-contenedor">
+                <!-- Aviso cuando un sensor llega al tope de 1000 lecturas -->
+                <p id="avisoLimite" class="aviso-limite" hidden></p>
 
+                <p id="sinLecturas" class="sin-lecturas" hidden>No hay lecturas en este periodo.</p>
+
+                <div class="tabla">
                     <table>
-
                         <thead>
-
                             <tr>
-                                <th>Temperatura</th>
-                                <th>Humedad</th>
-                                <th>Hora</th>
-                                <th>Estado %</th>
-                                <th>Estado °C</th>
+                                <th>Sensor</th>
+                                <th class="num">Valor</th>
+                                <th>Fecha y hora</th>
+                                <th>Estado</th>
                             </tr>
-
                         </thead>
-
-                        <tbody id="tablaRegistros">
-                            <!-- Los registros se cargarán desde JavaScript -->
-                        </tbody>
-
+                        <tbody id="tablaRegistros"></tbody>
                     </table>
-
                 </div>
 
             </section>
 
+        </div>
         </main>
 
     </div>
 
 
     <!-- LIBRERIA PARA GRAFICOS -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Versión fija: una versión nueva no cambia la página sola (plan 101 D3) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <!-- CLIENTE DEL BACKEND (sesión y peticiones) -->
+    <script src="../api.js"></script>
+
+    <script src="../notificaciones.js"></script>
 
     <!-- JAVASCRIPT DE DATOS -->
     <script src="datos.js"></script>

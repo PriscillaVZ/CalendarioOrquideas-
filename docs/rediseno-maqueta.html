@@ -1,0 +1,775 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Orquídeas Rediseño</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: slim sidebar + top bar shell; each view puts its summary first, detail below. Views route on the hash. */
+:root {
+  --bg: #f2f5f1;
+  --surface: #ffffff;
+  --sunken: #e9efe8;
+  --line: #dbe4da;
+  --fg: #1d3a2c;
+  --muted: #5f7468;
+  --brand: #214d3b;
+  --brand-2: #397b59;
+  --on-brand: #ffffff;
+  --orchid: #a8508f;
+  --orchid-soft: #e7a9d6;
+  --band: rgba(57,123,89,.12);
+  --scrim: rgba(16,30,22,.45);
+  --ok-bg: #e0f0e4; --ok-fg: #276744;
+  --hot-bg: #fde5df; --hot-fg: #b5412d;
+  --cold-bg: #e1edfa; --cold-fg: #356a9c;
+  --warn-bg: #fff0d9; --warn-fg: #94590f;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101a15; --surface: #17241d; --sunken: #1d2d25; --line: #2a3d33;
+  --fg: #e3eee6; --muted: #93a99b; --brand: #0d1611; --brand-2: #5aa57d; --on-brand: #0d1611; --orchid: #d886c2;
+  --band: rgba(90,165,125,.16); --scrim: rgba(0,0,0,.6);
+  --ok-bg: #1d3b2a; --ok-fg: #8fd4a8; --hot-bg: #42221c; --hot-fg: #f3a08f; --cold-bg: #1c2e42; --cold-fg: #9cc4ec; --warn-bg: #3d2e14; --warn-fg: #f0c27a;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #101a15; --surface: #17241d; --sunken: #1d2d25; --line: #2a3d33;
+  --fg: #e3eee6; --muted: #93a99b; --brand: #0d1611; --brand-2: #5aa57d; --on-brand: #0d1611; --orchid: #d886c2;
+  --band: rgba(90,165,125,.16); --scrim: rgba(0,0,0,.6);
+  --ok-bg: #1d3b2a; --ok-fg: #8fd4a8; --hot-bg: #42221c; --hot-fg: #f3a08f; --cold-bg: #1c2e42; --cold-fg: #9cc4ec; --warn-bg: #3d2e14; --warn-fg: #f0c27a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brand-2); outline-offset: 2px; }
+
+.app { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 220px; flex-shrink: 0; background: var(--brand); color: #e8f2ec; padding: 24px 14px; display: flex; flex-direction: column; gap: 28px; }
+.logo { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 20px; padding: 0 8px; }
+.logo svg { flex-shrink: 0; }
+.sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+.sidebar a { color: inherit; text-decoration: none; padding: 10px 12px; border-radius: 9px; opacity: .8; font-weight: 500; }
+.sidebar a:hover { background: rgba(255,255,255,.08); opacity: 1; }
+.sidebar a:focus-visible { outline-color: #fff; }
+.sidebar a.activo { background: rgba(255,255,255,.14); opacity: 1; box-shadow: inset 3px 0 0 var(--orchid-soft); }
+.sidebar .salir { margin-top: auto; font-size: 13px; }
+
+/* Content */
+main { flex: 1; min-width: 0; padding-block: 22px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.vista { display: flex; flex-direction: column; gap: 20px; }
+
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.head h1 { font-size: 30px; }
+.head p { margin-top: 2px; color: var(--muted); font-size: 14px; }
+.head-tools { display: flex; align-items: center; gap: 10px; position: relative; }
+
+/* Bell + avatar */
+.icon-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; cursor: pointer; }
+.icon-btn .count { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--orchid); color: #fff; font-size: 11px; font-weight: 600; display: grid; place-items: center; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--sunken); display: grid; place-items: center; font-weight: 600; color: var(--brand-2); }
+.avisos { position: absolute; right: 0; top: 48px; z-index: 20; width: min(340px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 12px 32px rgba(0,0,0,.14); overflow: hidden; }
+.avisos header { padding: 12px 16px; font-weight: 600; border-bottom: 1px solid var(--line); }
+.avisos ul { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; }
+.avisos li button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 8px 1fr; gap: 4px 10px; width: 100%; padding: 12px 16px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.avisos li button:hover { background: var(--sunken); }
+.avisos li button:focus-visible { outline: 2px solid var(--brand-2); outline-offset: -2px; }
+.avisos .pip { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; background: var(--orchid); }
+.avisos .leido .pip { background: transparent; }
+.avisos .tipo { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.avisos .msg { grid-column: 2; font-size: 14px; }
+.avisos .leido .msg { color: var(--muted); }
+.avisos .nuevo { color: var(--orchid); font-weight: 600; }
+
+/* Shared pieces */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; min-width: 0; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.panel h2 { font-size: 17px; }
+.panel-head small, .panel-head a { color: var(--muted); font-size: 13px; }
+.panel-head a { color: var(--brand-2); font-weight: 500; text-decoration: none; }
+.chip { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+.ok { background: var(--ok-bg); color: var(--ok-fg); }
+.hot { background: var(--hot-bg); color: var(--hot-fg); }
+.cold { background: var(--cold-bg); color: var(--cold-fg); }
+.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.none { background: var(--sunken); color: var(--muted); }
+.chip.dot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 9px; font-weight: 500; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--sunken); }
+.btn.primary { background: var(--brand-2); border-color: var(--brand-2); color: var(--on-brand); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.danger { color: var(--hot-fg); }
+.valor { font-family: var(--font-display); font-size: 36px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.valor span { font-size: 18px; color: var(--muted); font-weight: 500; margin-left: 2px; }
+.estado { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 12px; background: var(--hot-bg); color: var(--hot-fg); font-weight: 500; }
+.estado .pulse { width: 9px; height: 9px; border-radius: 50%; background: currentColor; flex-shrink: 0; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 20%, transparent); }
+.estado small { margin-left: auto; color: var(--muted); font-weight: 400; white-space: nowrap; }
+
+/* HOME */
+.home-top { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 14px; }
+.lectura { display: flex; flex-direction: column; gap: 10px; }
+.lectura .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.lectura .valor { font-size: 48px; }
+.lectura small { color: var(--muted); font-size: 12px; }
+.proximo { background: var(--brand-2); border-color: var(--brand-2); color: var(--on-brand); display: flex; flex-direction: column; gap: 6px; }
+.proximo .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+.proximo .cuando { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.1; }
+.proximo .cuenta { opacity: .85; font-size: 14px; }
+.proximo a { margin-top: auto; color: inherit; font-weight: 600; font-size: 14px; }
+.home-bottom { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+.reloj { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.reloj svg { width: 150px; height: 150px; }
+.reloj .hora { font-family: var(--font-display); font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.reloj small { color: var(--muted); font-size: 13px; }
+
+/* Calendar (shared by Home and Calendario) */
+.mes-nav { display: flex; align-items: center; gap: 8px; }
+.mes-nav h3 { font-family: var(--font-body); font-size: 15px; font-weight: 600; min-width: 130px; text-align: center; text-transform: capitalize; }
+.mes-nav button { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+.mes-nav button:hover { background: var(--sunken); }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal .dow { text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 6px 0; }
+.cal .dia { aspect-ratio: 1; max-width: 100%; border-radius: 10px; border: 1px solid transparent; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-variant-numeric: tabular-nums; position: relative; }
+.cal button.dia { cursor: pointer; }
+.cal button.dia:hover { background: var(--sunken); }
+.cal .dia.hoy { border-color: var(--brand-2); font-weight: 700; }
+.cal .dia.pasado { color: var(--muted); }
+.cal .dia.riego { background: var(--ok-bg); color: var(--ok-fg); font-weight: 600; }
+.cal .dia.riego::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand-2); }
+.cal-grande .dia { aspect-ratio: auto; min-height: 84px; align-items: flex-start; justify-content: flex-start; padding: 8px; border-color: var(--line); background: var(--surface); }
+.cal-grande .dia.vacio { border-color: transparent; background: transparent; }
+.cal-grande .dia.riego::after { display: none; }
+.cal-grande .horas { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.cal-grande .horas span { font-size: 11px; font-weight: 600; background: var(--brand-2); color: var(--on-brand); border-radius: 5px; padding: 1px 6px; text-align: left; }
+.leyenda { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
+.leyenda i { width: 12px; height: 12px; border-radius: 4px; background: var(--ok-bg); border: 1px solid var(--brand-2); }
+
+.cal-layout { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.lista-riegos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lista-riegos li { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: center; padding: 10px; border-radius: 10px; background: var(--sunken); }
+.fecha-box { text-align: center; background: var(--surface); border-radius: 8px; padding: 4px 0; line-height: 1.1; }
+.fecha-box b { display: block; font-family: var(--font-display); font-size: 20px; }
+.fecha-box small { font-size: 11px; text-transform: uppercase; color: var(--muted); }
+.lista-riegos strong { display: block; font-size: 14px; }
+.lista-riegos span { font-size: 13px; color: var(--muted); }
+
+/* DATOS */
+.periodo { display: inline-flex; background: var(--sunken); border-radius: 10px; padding: 3px; }
+.periodo button { border: 0; background: transparent; color: var(--muted); font-weight: 500; font-size: 13px; padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.periodo button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.sensores { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.sensor { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.sensor-top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.sensor h3 { font-size: 15px; font-family: var(--font-body); font-weight: 600; }
+.sensor .tipo { font-size: 12px; color: var(--muted); }
+.rango { position: relative; height: 6px; border-radius: 99px; background: var(--sunken); }
+.rango i { position: absolute; top: 0; bottom: 0; background: var(--band); border-left: 2px solid var(--brand-2); border-right: 2px solid var(--brand-2); }
+.rango b { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 3px solid var(--fg); transform: translate(-50%, -50%); }
+.rango-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sensor footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.graficos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--muted); font: 11px var(--font-body); }
+.chart .grid { stroke: var(--line); }
+.chart .band { fill: var(--band); }
+.chart .line { fill: none; stroke: var(--brand-2); stroke-width: 2; }
+.chart .line.temp { stroke: var(--orchid); }
+.chart .area { fill: var(--brand-2); opacity: .08; }
+.chart .area.temp { fill: var(--orchid); }
+.chart .leyenda i { background: var(--band); }
+.tabla { max-height: 22rem; overflow: auto; border-radius: 10px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+th { position: sticky; top: 0; background: var(--sunken); text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 10px 14px; }
+td { padding: 11px 14px; border-top: 1px solid var(--line); white-space: nowrap; }
+td.num, th.num { text-align: right; }
+td.num { font-weight: 600; }
+tbody tr:hover { background: var(--sunken); }
+
+/* CONFIGURACION */
+.filas-sensor { display: flex; flex-direction: column; gap: 10px; }
+.fila-sensor { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; align-items: center; }
+.fila-sensor.apagado { opacity: .65; }
+.fila-sensor h3 { font-family: var(--font-body); font-size: 15px; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fila-sensor h3 .id { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.acciones { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.acciones .btn { padding: 6px 10px; font-size: 13px; }
+.revisar { grid-column: 1 / -1; background: var(--warn-bg); color: var(--warn-fg); border-radius: 10px; padding: 10px 14px; font-size: 13px; }
+.revisar ul { margin: 4px 0 0; padding-left: 18px; }
+.clave { background: var(--sunken); border: 1px dashed var(--brand-2); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.clave-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.clave code { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 14px; background: var(--surface); padding: 8px 10px; border-radius: 8px; }
+.clave small { color: var(--muted); }
+
+/* Forms + dialogs */
+dialog { border: 0; padding: 0; border-radius: 16px; background: var(--surface); color: var(--fg); width: min(440px, calc(100vw - 32px)); box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+dialog::backdrop { background: var(--scrim); }
+dialog form { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.dlg-head h2 { font-size: 20px; }
+.dlg-head p { color: var(--muted); font-size: 14px; text-transform: capitalize; }
+.cerrar { border: 0; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+.field input, .field select { padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); font-weight: 400; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dlg-foot { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.dlg-foot .danger { margin-right: auto; }
+.chips-dia { display: flex; gap: 6px; flex-wrap: wrap; }
+.chips-dia button { border: 1px solid var(--line); background: var(--sunken); border-radius: 99px; padding: 4px 12px; font-size: 13px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chips-dia button[aria-pressed="true"] { background: var(--brand-2); color: var(--on-brand); border-color: var(--brand-2); }
+.ayuda { font-size: 12px; color: var(--muted); }
+
+/* LOGIN */
+.login { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+.login-art { background: var(--brand); color: #e8f2ec; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; position: relative; overflow: hidden; }
+.login-art h1 { font-size: 40px; line-height: 1.1; max-width: 12ch; }
+.login-art p { opacity: .8; max-width: 36ch; }
+.login-art .flor { position: absolute; right: -60px; bottom: -60px; width: 340px; height: 340px; opacity: .22; }
+.login-form { display: grid; place-items: center; padding-block: 32px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.login-form form { width: min(380px, 100%); display: flex; flex-direction: column; gap: 16px; }
+.login-form h2 { font-size: 28px; }
+.login-form .sub { color: var(--muted); }
+.login-form .btn.primary { justify-content: center; padding: 11px; font-size: 15px; }
+.login-form .swap { font-size: 14px; color: var(--muted); text-align: center; }
+.login-form .swap button { border: 0; background: none; color: var(--brand-2); font-weight: 600; cursor: pointer; padding: 0; }
+.nota { font-size: 12px; color: var(--muted); text-align: center; }
+
+@media (max-width: 980px) {
+  .home-top { grid-template-columns: 1fr 1fr; }
+  .proximo { grid-column: 1 / -1; }
+  .home-bottom, .cal-layout, .graficos { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .login { grid-template-columns: 1fr; }
+  .login-art { padding: 28px max(16px, env(safe-area-inset-right, 0px)) 28px max(16px, env(safe-area-inset-left, 0px)); }
+  .login-art h1 { font-size: 28px; }
+  .login-art .flor { width: 200px; height: 200px; right: -40px; bottom: -50px; }
+  .fila-sensor { grid-template-columns: 1fr; }
+  .acciones { justify-content: flex-start; }
+}
+@media (max-width: 640px) {
+  .app { flex-direction: column; }
+  .sidebar { width: 100%; flex-direction: row; align-items: center; gap: 12px; padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow-x: auto; }
+  .logo span, .sidebar .salir { display: none; }
+  .sidebar nav { flex-direction: row; gap: 2px; }
+  .sidebar a { padding: 8px 10px; font-size: 13px; white-space: nowrap; }
+  .sidebar a.activo { box-shadow: inset 0 -2px 0 var(--orchid-soft); }
+  .head h1 { font-size: 24px; }
+  .home-top { grid-template-columns: 1fr; }
+  .lectura .valor { font-size: 40px; }
+  .estado { flex-wrap: wrap; }
+  .estado small { margin-left: 21px; }
+  .cal-grande .dia { min-height: 56px; padding: 4px; font-size: 13px; }
+  .cal-grande .horas span { font-size: 0; padding: 0; height: 5px; }
+  .field-row { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<!-- ============ LOGIN ============ -->
+<div class="login" id="vistaLogin" hidden>
+  <div class="login-art">
+    <div class="logo" style="padding:0">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><use href="#flor"/></svg>
+      <span>Orquídeas</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;position:relative">
+      <h1>Riego y clima de tus orquídeas, en un lugar.</h1>
+      <p>Programa los riegos, mira la humedad y la temperatura del invernadero y recibe un aviso cuando algo sale de rango.</p>
+    </div>
+    <svg class="flor" viewBox="0 0 32 32" aria-hidden="true"><use href="#flor"/></svg>
+  </div>
+  <div class="login-form">
+    <form id="formLogin">
+      <div>
+        <h2 id="tituloLogin">Iniciar sesión</h2>
+        <p class="sub" id="subLogin">Entra con tu correo y contraseña.</p>
+      </div>
+      <label class="field" id="campoNombre" hidden>Nombre<input type="text" id="nombre" maxlength="100" autocomplete="name"></label>
+      <label class="field">Correo<input type="email" id="email" required maxlength="150" autocomplete="email" value="cultivo@ejemplo.cl"></label>
+      <label class="field">Contraseña<input type="password" id="password" required autocomplete="current-password" value="ejemplo123"></label>
+      <button class="btn primary" type="submit" id="enviarLogin">Entrar</button>
+      <p class="swap"><span id="swapTexto">¿No tienes cuenta?</span> <button type="button" id="cambiarModo">Crear cuenta</button></p>
+      <p class="nota">Maqueta: entrar lleva a Home sin conectarse al backend.</p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app" id="vistaApp">
+  <aside class="sidebar">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+        <defs><g id="flor"><g fill="#e7a9d6"><ellipse cx="16" cy="8" rx="5" ry="7"/><ellipse cx="8" cy="15" rx="7" ry="4.5" transform="rotate(-20 8 15)"/><ellipse cx="24" cy="15" rx="7" ry="4.5" transform="rotate(20 24 15)"/></g><path d="M12 20c1 5 7 5 8 0-2 2-6 2-8 0z" fill="#fff"/><circle cx="16" cy="16" r="2.5" fill="#f6d77a"/></g></defs>
+        <use href="#flor"/>
+      </svg>
+      <span>Orquídeas</span>
+    </div>
+    <nav>
+      <a href="#inicio" data-nav="inicio">Home</a>
+      <a href="#datos" data-nav="datos">Datos</a>
+      <a href="#calendario" data-nav="calendario">Calendario de Riego</a>
+      <a href="#configuracion" data-nav="configuracion">Configuración</a>
+    </nav>
+    <a href="#login" class="salir">Cerrar sesión</a>
+  </aside>
+
+  <main>
+    <div class="wrap">
+      <header class="head">
+        <div>
+          <h1 id="titulo">Panel principal</h1>
+          <p id="subtitulo">Invernadero principal · datos de ejemplo</p>
+        </div>
+        <div class="head-tools">
+          <div class="periodo" role="group" aria-label="Periodo" id="periodo" hidden>
+            <button id="p24" aria-pressed="true">24 horas</button>
+            <button id="p168" aria-pressed="false">7 días</button>
+          </div>
+          <button class="icon-btn" id="campana" aria-expanded="false" aria-label="Notificaciones">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="count" id="noLeidos">2</span>
+          </button>
+          <div class="avatar" aria-hidden="true">C</div>
+          <div class="avisos" id="avisos" hidden>
+            <header>Notificaciones</header>
+            <ul id="listaAvisos"></ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- HOME -->
+      <section class="vista" data-view="inicio">
+        <div class="home-top">
+          <div class="panel lectura">
+            <div class="row">Temperatura <span class="chip hot">Calor</span></div>
+            <div class="valor">27,4<span>°C</span></div>
+            <small>Ideal 18–26 °C · hace 2 min</small>
+          </div>
+          <div class="panel lectura">
+            <div class="row">Humedad <span class="chip ok">En rango</span></div>
+            <div class="valor">68<span>%</span></div>
+            <small>Ideal 60–80 % · hace 2 min</small>
+          </div>
+          <div class="panel proximo">
+            <span class="eyebrow">Próximo riego</span>
+            <span class="cuando" id="proxCuando">Mañana, 08:00</span>
+            <span class="cuenta" id="proxCuenta">Faltan 15 h</span>
+            <a href="#calendario">Ver calendario →</a>
+          </div>
+        </div>
+        <div class="home-bottom">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Fechas de riego</h2>
+              <div class="mes-nav"><button data-mes="-1" aria-label="Mes anterior">‹</button><h3 class="mes-label"></h3><button data-mes="1" aria-label="Mes siguiente">›</button></div>
+            </div>
+            <div class="cal" id="calHome"></div>
+            <div class="leyenda"><i></i> Días con riego programado</div>
+          </div>
+          <div class="panel reloj">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="46" fill="var(--sunken)" stroke="var(--line)" stroke-width="2"/>
+              <g id="marcas" stroke="var(--muted)" stroke-linecap="round"></g>
+              <line id="mh" x1="50" y1="50" x2="50" y2="28" stroke="var(--fg)" stroke-width="4" stroke-linecap="round"/>
+              <line id="mm" x1="50" y1="50" x2="50" y2="16" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+              <line id="ms" x1="50" y1="56" x2="50" y2="12" stroke="var(--orchid)" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="3" fill="var(--orchid)"/>
+            </svg>
+            <div>
+              <div class="hora" id="hora">--:--:--</div>
+              <small id="fechaHoy"></small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DATOS -->
+      <section class="vista" data-view="datos" hidden>
+        <div class="estado" role="status">
+          <span class="pulse"></span>
+          <span>Temperatura sobre el máximo en el invernadero. Ventila o aumenta la sombra.</span>
+          <small>Actualizado hace 2 min</small>
+        </div>
+        <div class="sensores">
+          <article class="sensor">
+            <div class="sensor-top"><div><h3>Humedad invernadero</h3><div class="tipo">Humedad relativa</div></div><span class="chip ok">En rango</span></div>
+            <div class="valor">68<span>%</span></div>
+            <div class="rango"><i style="left:40%;right:20%"></i><b style="left:56%"></b></div>
+            <div class="rango-labels"><span>mín 60 %</span><span>máx 80 %</span></div>
+            <footer>Última lectura 18/11 16:47:12</footer>
+          </article>
+          <article class="sensor">
+            <div class="sensor-top"><div><h3>Temperatura invernadero</h3><div class="tipo">Temperatura</div></div><span class="chip hot">Calor</span></div>
+            <div class="valor">27,4<span>°C</span></div>
+            <div class="rango"><i style="left:26.7%;right:13.3%"></i><b style="left:92%"></b></div>
+            <div class="rango-labels"><span>mín 18 °C</span><span>máx 26 °C</span></div>
+            <footer>Última lectura 18/11 16:47:12</footer>
+          </article>
+          <article class="sensor">
+            <div class="sensor-top"><div><h3>Temperatura vivero</h3><div class="tipo">Temperatura</div></div><span class="chip none">Sin lecturas</span></div>
+            <div class="valor" style="color:var(--muted)">--</div>
+            <div class="rango"><i style="left:26.7%;right:13.3%"></i></div>
+            <div class="rango-labels"><span>mín 18 °C</span><span>máx 26 °C</span></div>
+            <footer>Esperando la primera lectura</footer>
+          </article>
+        </div>
+        <div class="graficos">
+          <div class="panel chart">
+            <div class="panel-head"><h2>Humedad</h2><small class="per">% · últimas 24 h</small></div>
+            <svg id="gHum" viewBox="0 0 520 220" role="img" aria-label="Humedad en las últimas 24 horas"></svg>
+            <div class="leyenda"><i></i> Rango ideal</div>
+          </div>
+          <div class="panel chart">
+            <div class="panel-head"><h2>Temperatura</h2><small class="per">°C · últimas 24 h</small></div>
+            <svg id="gTemp" viewBox="0 0 520 220" role="img" aria-label="Temperatura en las últimas 24 horas"></svg>
+            <div class="leyenda"><i></i> Rango ideal</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Registro histórico</h2><small id="conteo"></small></div>
+          <div class="tabla">
+            <table>
+              <thead><tr><th>Sensor</th><th class="num">Valor</th><th>Fecha y hora</th><th>Estado</th></tr></thead>
+              <tbody id="filas"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CALENDARIO -->
+      <section class="vista" data-view="calendario" hidden>
+        <div class="cal-layout">
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="mes-label" style="text-transform:capitalize"></h2>
+              <div class="mes-nav"><button data-mes="-1" aria-label="Mes anterior">‹</button><button class="btn" data-mes="0" style="height:32px">Hoy</button><button data-mes="1" aria-label="Mes siguiente">›</button></div>
+            </div>
+            <div class="cal cal-grande" id="calGrande"></div>
+            <div class="leyenda">Toca un día para programar, editar o eliminar un riego.</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Próximos riegos</h2><small id="cuentaRiegos"></small></div>
+            <ul class="lista-riegos" id="listaRiegos"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACION -->
+      <section class="vista" data-view="configuracion" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Mis sensores</h2>
+              <small>Registra tus sensores, elige cada cuánto miden y revisa si están enviando datos.</small>
+            </div>
+            <button class="btn primary" id="btnNuevoSensor" type="button">+ Registrar sensor</button>
+          </div>
+          <div class="clave" id="claveSensor" role="status" hidden style="margin-bottom:12px">
+            <strong id="claveTitulo">Sensor 3 · clave nueva</strong>
+            <div class="clave-row"><code id="claveValor">sk_7Hq2-Lm9X-pV4c-R8zT</code><button class="btn" type="button" id="copiarClave">Copiar</button><button class="btn" type="button" id="cerrarClave">Listo</button></div>
+            <small>Cárgala en el dispositivo ahora. No se volverá a mostrar.</small>
+          </div>
+          <div class="filas-sensor" id="listaSensores"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Riego dialog -->
+<dialog id="dlgRiego">
+  <form method="dialog" id="formRiego">
+    <div class="dlg-head">
+      <div><h2>Programar riego</h2><p id="dlgFecha"></p></div>
+      <button class="cerrar" value="cancel" aria-label="Cerrar">×</button>
+    </div>
+    <div id="riegosDia" hidden>
+      <p class="ayuda" style="margin-bottom:6px">Ya programados este día (toca uno para editarlo):</p>
+      <div class="chips-dia" id="chipsDia"></div>
+    </div>
+    <label class="field">Hora de riego<input type="time" id="horaRiego" value="08:00" required></label>
+    <div class="dlg-foot">
+      <button class="btn danger" type="button" id="eliminarRiego" hidden>Eliminar</button>
+      <button class="btn" value="cancel" formnovalidate>Cancelar</button>
+      <button class="btn primary" value="guardar" id="guardarRiego">Guardar riego</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Sensor dialog -->
+<dialog id="dlgSensor">
+  <form method="dialog" id="formSensor">
+    <div class="dlg-head">
+      <h2 id="tituloSensor">Registrar sensor</h2>
+      <button class="cerrar" value="cancel" aria-label="Cerrar" formnovalidate>×</button>
+    </div>
+    <label class="field">Nombre<input type="text" id="nombreSensor" required maxlength="100" placeholder="Ej.: Humedad invernadero"></label>
+    <div class="field-row">
+      <label class="field">Tipo<select id="tipoSensor"><option value="humidity">Humedad</option><option value="temperature">Temperatura</option></select></label>
+      <label class="field">Conexión<select id="conexionSensor"><option value="wifi">Wi-Fi</option><option value="bluetooth">Bluetooth</option></select></label>
+    </div>
+    <label class="field">Intervalo de lectura
+      <select id="intervaloSensor"><option value="1">Cada 1 minuto</option><option value="5">Cada 5 minutos</option><option value="15">Cada 15 minutos</option><option value="30">Cada 30 minutos</option><option value="60" selected>Cada 1 hora</option><option value="120">Cada 2 horas</option><option value="360">Cada 6 horas</option></select>
+    </label>
+    <div class="field-row">
+      <label class="field">Mínimo<input type="number" id="minSensor" step="0.01"></label>
+      <label class="field">Máximo<input type="number" id="maxSensor" step="0.01"></label>
+    </div>
+    <p class="ayuda" id="ayudaLimites">Deja un límite vacío si ese lado no debe generar alertas.</p>
+    <div class="dlg-foot">
+      <button class="btn" value="cancel" formnovalidate>Cancelar</button>
+      <button class="btn primary" value="guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+// ---------- Example data (mockup only) ----------
+const HOY = new Date(2026, 10, 18, 16, 49);
+const iso = d => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const riegos = [
+  ["2026-11-12", "08:00"], ["2026-11-15", "08:00"], ["2026-11-19", "08:00"], ["2026-11-19", "19:30"],
+  ["2026-11-22", "08:00"], ["2026-11-26", "08:00"], ["2026-11-29", "08:00"], ["2026-12-03", "08:00"]
+].map(([fecha, hora]) => ({ fecha, hora }));
+const avisos = [
+  { tipo: "Alerta de sensor", msg: "Temperatura invernadero: 27,4 °C, sobre el máximo de 26 °C.", cuando: "16:47", leido: false },
+  { tipo: "Recordatorio de riego", msg: "Riego programado para hoy a las 08:00.", cuando: "08:00", leido: false },
+  { tipo: "Alerta de sensor", msg: "Humedad invernadero: 58 %, bajo el mínimo de 60 %.", cuando: "Ayer 14:12", leido: true }
+];
+const sensores = [
+  { id: 1, nombre: "Humedad invernadero", tipo: "Humedad", con: "Wi-Fi", int: 15, min: "60 %", max: "80 %", estado: ["Conectado", "ok"], activo: true },
+  { id: 2, nombre: "Temperatura invernadero", tipo: "Temperatura", con: "Wi-Fi", int: 15, min: "18 °C", max: "26 °C", estado: ["Conectado", "ok"], activo: true },
+  { id: 3, nombre: "Temperatura vivero", tipo: "Temperatura", con: "Bluetooth", int: 60, min: "18 °C", max: "26 °C", estado: ["Esperando la primera lectura", "warn"], activo: true, revisar: true },
+  { id: 4, nombre: "Humedad terraza", tipo: "Humedad", con: "Wi-Fi", int: 60, min: "55 %", max: "—", estado: ["Inactivo", "none"], activo: false }
+];
+
+// ---------- Router ----------
+const VISTAS = {
+  inicio: ["Panel principal", "Invernadero principal · datos de ejemplo"],
+  datos: ["Datos ambientales", "Invernadero principal · datos de ejemplo"],
+  calendario: ["Calendario de riego", "Programa, edita o elimina los riegos de tus orquídeas"],
+  configuracion: ["Configuración", "Sensores y ajustes de tu cuenta"]
+};
+function ruta() {
+  const v = location.hash.slice(1);
+  const login = v === "login";
+  document.getElementById("vistaLogin").hidden = !login;
+  document.getElementById("vistaApp").hidden = login;
+  if (login) return;
+  const actual = VISTAS[v] ? v : "inicio";
+  for (const s of document.querySelectorAll("[data-view]")) s.hidden = s.dataset.view !== actual;
+  for (const a of document.querySelectorAll("[data-nav]")) {
+    a.classList.toggle("activo", a.dataset.nav === actual);
+    a.toggleAttribute("aria-current", a.dataset.nav === actual);
+  }
+  document.getElementById("titulo").textContent = VISTAS[actual][0];
+  document.getElementById("subtitulo").textContent = VISTAS[actual][1];
+  document.getElementById("periodo").hidden = actual !== "datos";
+}
+addEventListener("hashchange", ruta);
+ruta();
+
+// ---------- Notifications ----------
+const campana = document.getElementById("campana"), panelAvisos = document.getElementById("avisos");
+function pintarAvisos() {
+  const n = avisos.filter(a => !a.leido).length;
+  const c = document.getElementById("noLeidos");
+  c.textContent = n; c.hidden = n === 0;
+  document.getElementById("listaAvisos").innerHTML = avisos.map((a, i) =>
+    `<li class="${a.leido ? "leido" : ""}"><button data-i="${i}"><span class="pip"></span><span class="tipo"><span>${a.tipo} · ${a.cuando}</span>${a.leido ? "<span>Leído</span>" : '<span class="nuevo">No leído</span>'}</span><span class="msg">${a.msg}</span></button></li>`).join("");
+}
+campana.onclick = () => { panelAvisos.hidden = !panelAvisos.hidden; campana.setAttribute("aria-expanded", !panelAvisos.hidden); };
+document.getElementById("listaAvisos").onclick = e => { const b = e.target.closest("button"); if (b) { avisos[b.dataset.i].leido = true; pintarAvisos(); } };
+document.addEventListener("click", e => { if (!e.target.closest(".head-tools")) { panelAvisos.hidden = true; campana.setAttribute("aria-expanded", "false"); } });
+pintarAvisos();
+
+// ---------- Calendar ----------
+let mes = new Date(HOY.getFullYear(), HOY.getMonth(), 1);
+const DOW = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+function pintarCal(el, grande) {
+  const offset = (mes.getDay() + 6) % 7, dias = new Date(mes.getFullYear(), mes.getMonth() + 1, 0).getDate();
+  let html = DOW.map(d => `<div class="dow">${d}</div>`).join("") + '<div class="dia vacio"></div>'.repeat(offset);
+  for (let d = 1; d <= dias; d++) {
+    const f = iso(new Date(mes.getFullYear(), mes.getMonth(), d));
+    const del = riegos.filter(r => r.fecha === f).sort((a, b) => a.hora.localeCompare(b.hora));
+    const cls = ["dia", f === iso(HOY) && "hoy", f < iso(HOY) && "pasado", del.length && "riego"].filter(Boolean).join(" ");
+    const horas = grande && del.length ? `<div class="horas">${del.map(r => `<span>${r.hora}</span>`).join("")}</div>` : "";
+    html += grande
+      ? `<button class="${cls}" data-fecha="${f}" aria-label="${d}${del.length ? ", " + del.length + " riego(s)" : ""}">${d}${horas}</button>`
+      : `<div class="${cls}">${d}</div>`;
+  }
+  el.innerHTML = html;
+}
+function pintarTodo() {
+  const label = mes.toLocaleDateString("es-CL", { month: "long", year: "numeric" });
+  for (const h of document.querySelectorAll(".mes-label")) h.textContent = label;
+  pintarCal(document.getElementById("calHome"), false);
+  pintarCal(document.getElementById("calGrande"), true);
+  const prox = riegos.filter(r => r.fecha >= iso(HOY)).sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+  document.getElementById("cuentaRiegos").textContent = prox.length + " programados";
+  document.getElementById("listaRiegos").innerHTML = prox.length ? prox.slice(0, 6).map(r => {
+    const d = new Date(r.fecha + "T" + r.hora);
+    return `<li><div class="fecha-box"><b>${d.getDate()}</b><small>${d.toLocaleDateString("es-CL", { month: "short" }).replace(".", "")}</small></div><div><strong>Riego a las ${r.hora}</strong><span>${d.toLocaleDateString("es-CL", { weekday: "long" })}</span></div></li>`;
+  }).join("") : "<li>No hay riegos programados.</li>";
+  if (prox[0]) {
+    const d = new Date(prox[0].fecha + "T" + prox[0].hora), h = Math.round((d - HOY) / 36e5);
+    document.getElementById("proxCuando").textContent = (prox[0].fecha === iso(new Date(HOY.getTime() + 864e5)) ? "Mañana" : d.toLocaleDateString("es-CL", { weekday: "long", day: "numeric" })) + ", " + prox[0].hora;
+    document.getElementById("proxCuenta").textContent = "Faltan " + h + " h";
+  }
+}
+for (const b of document.querySelectorAll("[data-mes]")) b.onclick = () => {
+  const n = +b.dataset.mes;
+  mes = n ? new Date(mes.getFullYear(), mes.getMonth() + n, 1) : new Date(HOY.getFullYear(), HOY.getMonth(), 1);
+  pintarTodo();
+};
+pintarTodo();
+
+// Riego dialog
+const dlgRiego = document.getElementById("dlgRiego"), horaRiego = document.getElementById("horaRiego"), btnEliminar = document.getElementById("eliminarRiego");
+let fechaSel = null, editando = null;
+document.getElementById("calGrande").onclick = e => {
+  const b = e.target.closest("button[data-fecha]"); if (!b) return;
+  fechaSel = b.dataset.fecha; editando = null;
+  document.getElementById("dlgFecha").textContent = new Date(fechaSel + "T12:00").toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" });
+  pintarChips(); horaRiego.value = "08:00";
+  dlgRiego.showModal();
+};
+function pintarChips() {
+  const del = riegos.filter(r => r.fecha === fechaSel);
+  document.getElementById("riegosDia").hidden = !del.length;
+  document.getElementById("chipsDia").innerHTML = del.map(r => `<button type="button" data-h="${r.hora}" aria-pressed="${r === editando}">${r.hora}</button>`).join("");
+  btnEliminar.hidden = !editando;
+  document.getElementById("guardarRiego").textContent = editando ? "Guardar cambios" : "Guardar riego";
+}
+document.getElementById("chipsDia").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const r = riegos.find(r => r.fecha === fechaSel && r.hora === b.dataset.h);
+  editando = editando === r ? null : r;
+  if (editando) horaRiego.value = r.hora;
+  pintarChips();
+};
+btnEliminar.onclick = () => { riegos.splice(riegos.indexOf(editando), 1); dlgRiego.close(); pintarTodo(); };
+dlgRiego.addEventListener("close", () => {
+  if (dlgRiego.returnValue !== "guardar") return;
+  if (editando) editando.hora = horaRiego.value; else riegos.push({ fecha: fechaSel, hora: horaRiego.value });
+  pintarTodo();
+});
+
+// ---------- Clock ----------
+document.getElementById("marcas").innerHTML = Array.from({ length: 12 }, (_, i) => `<line x1="50" y1="8" x2="50" y2="${i % 3 ? 11 : 14}" stroke-width="${i % 3 ? 1.2 : 2.2}" transform="rotate(${i * 30} 50 50)"/>`).join("");
+function tic() {
+  const n = new Date();
+  const rot = (id, deg) => document.getElementById(id).setAttribute("transform", `rotate(${deg} 50 50)`);
+  rot("mh", (n.getHours() % 12) * 30 + n.getMinutes() / 2); rot("mm", n.getMinutes() * 6); rot("ms", n.getSeconds() * 6);
+  document.getElementById("hora").textContent = n.toLocaleTimeString("es-CL", { hourCycle: "h23" });
+  document.getElementById("fechaHoy").textContent = n.toLocaleDateString("es-CL", { weekday: "long", day: "numeric", month: "long" }) + " · hora del dispositivo";
+}
+tic(); setInterval(tic, 1000);
+
+// ---------- Datos: charts + table ----------
+const hum = Array.from({ length: 25 }, (_, i) => 70 + 9 * Math.cos((i - 5) / 24 * 2 * Math.PI) + Math.sin(i * 1.7) * 1.5);
+const temp = Array.from({ length: 25 }, (_, i) => 21 + 5.5 * Math.sin((i - 9) / 24 * 2 * Math.PI) + Math.sin(i * 2.3) * .6 + (i > 21 ? 1.2 : 0));
+function chart(svg, data, lo, hi, min, max, cls) {
+  const W = 520, H = 220, L = 34, R = 8, T = 10, B = 24;
+  const x = i => L + i / (data.length - 1) * (W - L - R);
+  const y = v => T + (max - v) / (max - min) * (H - T - B);
+  const ticks = [0, 1, 2, 3, 4].map(k => min + k * (max - min) / 4);
+  const pts = data.map((v, i) => x(i).toFixed(1) + "," + y(v).toFixed(1)).join(" ");
+  svg.innerHTML =
+    ticks.map(t => `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${Math.round(t)}</text>`).join("") +
+    `<rect class="band" x="${L}" width="${W - L - R}" y="${y(hi)}" height="${y(lo) - y(hi)}"/>` +
+    `<polygon class="area ${cls}" points="${x(0)},${y(min)} ${pts} ${x(data.length - 1)},${y(min)}"/>` +
+    `<polyline class="line ${cls}" points="${pts}"/>` +
+    `<circle cx="${x(data.length - 1)}" cy="${y(data.at(-1))}" r="4" fill="var(--surface)" stroke="var(${cls ? "--orchid" : "--brand-2"})" stroke-width="2.5"/>` +
+    [0, 6, 12, 18, 24].map(h => `<text x="${x(h)}" y="${H - 6}" text-anchor="${h === 0 ? "start" : h === 24 ? "end" : "middle"}">${String((16 + h) % 24).padStart(2, "0")}:00</text>`).join("");
+}
+chart(document.getElementById("gHum"), hum, 60, 80, 50, 90, "");
+chart(document.getElementById("gTemp"), temp, 18, 26, 12, 30, "temp");
+const estadoDe = (v, lo, hi, bajo, alto) => v < lo ? [bajo, "cold"] : v > hi ? [alto, "hot"] : ["En rango", "ok"];
+const filas = [];
+for (let i = 24; i >= 13; i--) {
+  const hora = String((16 + i) % 24).padStart(2, "0") + ":47", dia = i >= 8 ? "18/11" : "17/11";
+  const [tt, tc] = estadoDe(temp[i], 18, 26, "Frío", "Calor"), [ht, hc] = estadoDe(hum[i], 60, 80, "Baja", "Alta");
+  filas.push(`<tr><td>Temperatura invernadero</td><td class="num">${temp[i].toFixed(1).replace(".", ",")} °C</td><td>${dia} ${hora}</td><td><span class="chip ${tc}">${tt}</span></td></tr>`);
+  filas.push(`<tr><td>Humedad invernadero</td><td class="num">${Math.round(hum[i])} %</td><td>${dia} ${hora}</td><td><span class="chip ${hc}">${ht}</span></td></tr>`);
+}
+document.getElementById("filas").innerHTML = filas.join("");
+document.getElementById("conteo").textContent = filas.length + " lecturas";
+for (const b of document.querySelectorAll(".periodo button")) b.onclick = () => {
+  for (const o of document.querySelectorAll(".periodo button")) o.setAttribute("aria-pressed", o === b);
+  for (const s of document.querySelectorAll(".per")) s.textContent = s.textContent.replace(/últim.*/, b.id === "p24" ? "últimas 24 h" : "últimos 7 días");
+};
+
+// ---------- Configuración ----------
+function pintarSensores() {
+  document.getElementById("listaSensores").innerHTML = sensores.map(s => `
+    <div class="fila-sensor ${s.activo ? "" : "apagado"}">
+      <div>
+        <h3><span class="id">#${s.id}</span> ${s.nombre} <span class="chip dot ${s.estado[1]}">${s.estado[0]}</span></h3>
+        <div class="meta"><span>${s.tipo}</span><span>${s.con}</span><span>Cada ${s.int} min</span><span>Mín ${s.min}</span><span>Máx ${s.max}</span></div>
+      </div>
+      <div class="acciones">
+        <button class="btn" data-acc="editar" data-id="${s.id}">Editar</button>
+        <button class="btn" data-acc="activo" data-id="${s.id}">${s.activo ? "Desactivar" : "Activar"}</button>
+        <button class="btn" data-acc="clave" data-id="${s.id}">Clave nueva</button>
+      </div>
+      ${s.revisar ? `<div class="revisar"><strong>Qué revisar</strong><ul><li>Que el dispositivo tenga energía.</li><li>Que esté al alcance por ${s.con}.</li><li>Que tenga el id de este sensor (${s.id}) y su clave vigente.</li><li>Que envíe las lecturas a la dirección del backend.</li></ul></div>` : ""}
+    </div>`).join("");
+}
+pintarSensores();
+const dlgSensor = document.getElementById("dlgSensor");
+document.getElementById("btnNuevoSensor").onclick = () => {
+  document.getElementById("formSensor").reset();
+  document.getElementById("tituloSensor").textContent = "Registrar sensor";
+  dlgSensor.showModal();
+};
+document.getElementById("listaSensores").onclick = e => {
+  const b = e.target.closest("button[data-acc]"); if (!b) return;
+  const s = sensores.find(s => s.id === +b.dataset.id);
+  if (b.dataset.acc === "editar") {
+    document.getElementById("tituloSensor").textContent = "Editar sensor #" + s.id;
+    document.getElementById("nombreSensor").value = s.nombre;
+    document.getElementById("tipoSensor").value = s.tipo === "Humedad" ? "humidity" : "temperature";
+    document.getElementById("conexionSensor").value = s.con === "Wi-Fi" ? "wifi" : "bluetooth";
+    document.getElementById("intervaloSensor").value = s.int;
+    document.getElementById("minSensor").value = parseFloat(s.min) || "";
+    document.getElementById("maxSensor").value = parseFloat(s.max) || "";
+    dlgSensor.showModal();
+  } else if (b.dataset.acc === "activo") {
+    s.activo = !s.activo; s.estado = s.activo ? ["Conectado", "ok"] : ["Inactivo", "none"]; s.revisar = false; pintarSensores();
+  } else {
+    document.getElementById("claveTitulo").textContent = "Sensor " + s.id + " · clave nueva";
+    document.getElementById("claveSensor").hidden = false;
+  }
+};
+document.getElementById("cerrarClave").onclick = () => document.getElementById("claveSensor").hidden = true;
+document.getElementById("copiarClave").onclick = e => {
+  const code = document.getElementById("claveValor");
+  navigator.clipboard.writeText(code.textContent).then(() => e.target.textContent = "Copiada", () => getSelection().selectAllChildren(code));
+};
+
+// ---------- Login ----------
+let registrando = false;
+document.getElementById("cambiarModo").onclick = () => {
+  registrando = !registrando;
+  document.getElementById("campoNombre").hidden = !registrando;
+  document.getElementById("nombre").required = registrando;
+  document.getElementById("tituloLogin").textContent = registrando ? "Crear cuenta" : "Iniciar sesión";
+  document.getElementById("subLogin").textContent = registrando ? "Solo necesitas tu nombre, correo y una contraseña." : "Entra con tu correo y contraseña.";
+  document.getElementById("enviarLogin").textContent = registrando ? "Crear cuenta" : "Entrar";
+  document.getElementById("swapTexto").textContent = registrando ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?";
+  document.getElementById("cambiarModo").textContent = registrando ? "Iniciar sesión" : "Crear cuenta";
+};
+document.getElementById("formLogin").onsubmit = e => { e.preventDefault(); location.hash = "inicio"; };
+</script>
+
+</body></html>

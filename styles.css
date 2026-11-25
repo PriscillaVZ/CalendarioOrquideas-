@@ -1,6 +1,65 @@
+/* =====================================
+   SISTEMA VISUAL DEL REDISEÑO (spec 104)
+   Valores tomados de docs/rediseno-maqueta.html. Cada color es una
+   variable: el tema oscuro solo cambia las variables (FR-1.b).
+===================================== */
+
+:root {
+    --bg: #f2f5f1;
+    --surface: #ffffff;
+    --sunken: #e9efe8;
+    --line: #dbe4da;
+    --fg: #1d3a2c;
+    --muted: #5f7468;
+    --brand: #214d3b;
+    --brand-2: #397b59;
+    --on-brand: #ffffff;
+    --orchid: #a8508f;
+    --orchid-soft: #e7a9d6;
+    --band: rgba(57, 123, 89, 0.12);
+    --scrim: rgba(16, 30, 22, 0.45);
+
+    /* Estados (FR-1.d): verde en rango, rojo alto, azul bajo, ámbar advertencia */
+    --ok-bg: #e0f0e4;   --ok-fg: #276744;
+    --hot-bg: #fde5df;  --hot-fg: #b5412d;
+    --cold-bg: #e1edfa; --cold-fg: #356a9c;
+    --warn-bg: #fff0d9; --warn-fg: #94590f;
+
+    /* Sin las fuentes de Google, la del sistema (FR-1.c) */
+    --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #101a15; --surface: #17241d; --sunken: #1d2d25; --line: #2a3d33;
+        --fg: #e3eee6; --muted: #93a99b;
+        --brand: #0d1611; --brand-2: #5aa57d; --on-brand: #0d1611; --orchid: #d886c2;
+        --band: rgba(90, 165, 125, 0.16); --scrim: rgba(0, 0, 0, 0.6);
+        --ok-bg: #1d3b2a;   --ok-fg: #8fd4a8;
+        --hot-bg: #42221c;  --hot-fg: #f3a08f;
+        --cold-bg: #1c2e42; --cold-fg: #9cc4ec;
+        --warn-bg: #3d2e14; --warn-fg: #f0c27a;
+        color-scheme: dark;
+    }
+}
+
+/* La misma paleta oscura a mano (revisiones en vivo, plan §5) */
+:root[data-theme="dark"] {
+    --bg: #101a15; --surface: #17241d; --sunken: #1d2d25; --line: #2a3d33;
+    --fg: #e3eee6; --muted: #93a99b;
+    --brand: #0d1611; --brand-2: #5aa57d; --on-brand: #0d1611; --orchid: #d886c2;
+    --band: rgba(90, 165, 125, 0.16); --scrim: rgba(0, 0, 0, 0.6);
+    --ok-bg: #1d3b2a;   --ok-fg: #8fd4a8;
+    --hot-bg: #42221c;  --hot-fg: #f3a08f;
+    --cold-bg: #1c2e42; --cold-fg: #9cc4ec;
+    --warn-bg: #3d2e14; --warn-fg: #f0c27a;
+    color-scheme: dark;
+}
 
 /* =====================================
-   CONFIGURACION GENERAL
+   BASE
 ===================================== */
 
 * {
@@ -10,436 +69,885 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f8f4;
-    color: #333;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
 }
 
+h1, h2, h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+}
+
+button, input, select {
+    font: inherit;
+    color: inherit;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Foco del teclado siempre visible (FR-1.f) */
+:focus-visible {
+    outline: 2px solid var(--brand-2);
+    outline-offset: 2px;
+}
 
 /* =====================================
-   CONTENEDOR PRINCIPAL
+   MARCO: BARRA LATERAL (FR-2)
 ===================================== */
 
-.contenedor {
+.app {
     display: flex;
     min-height: 100vh;
 }
 
+.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--brand);
+    color: #e8f2ec; /* la barra es oscura en ambos temas */
+    padding: 24px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    /* Fija a la ventana: "Cerrar sesión" queda a la vista en páginas largas */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
 
-/* =====================================
-   MENU LATERAL
-===================================== */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+}
 
-.menu-lateral {
-    width: 230px;
-    background-color: #244d38;
-    color: white;
-    padding: 25px 15px;
+.logo svg {
     flex-shrink: 0;
 }
 
-.menu-lateral h2 {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.menu-lateral nav {
+.sidebar nav {
     display: flex;
     flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar a,
+.sidebar .salir {
+    color: inherit;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 9px;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+.sidebar a:hover,
+.sidebar .salir:hover {
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 1;
+}
+
+.sidebar a:focus-visible,
+.sidebar .salir:focus-visible {
+    outline-color: #ffffff;
+}
+
+.sidebar a.activo {
+    background: rgba(255, 255, 255, 0.14);
+    opacity: 1;
+    box-shadow: inset 3px 0 0 var(--orchid-soft);
+}
+
+.sidebar .salir {
+    margin-top: auto;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* =====================================
+   MARCO: CONTENIDO Y ENCABEZADO (FR-3)
+===================================== */
+
+main {
+    flex: 1;
+    min-width: 0;
+    padding: 22px 16px 40px;
+}
+
+.wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
 }
 
-.menu-lateral a {
-    text-decoration: none;
-    color: white;
-    padding: 14px;
-    border-radius: 8px;
-    transition: 0.3s;
+.head h1 {
+    font-size: 30px;
 }
 
-.menu-lateral a:hover,
-.menu-lateral a.activo {
-    background-color: #3d7553;
+.head p {
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 14px;
 }
 
-
-/* =====================================
-   CONTENIDO PRINCIPAL
-===================================== */
-
-.contenido {
-    flex: 1;
-    padding: 30px;
-    min-width: 0;
-}
-
-
-/* =====================================
-   ENCABEZADO
-===================================== */
-
-.encabezado {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 35px;
-}
-
-.encabezado h1 {
-    color: #244d38;
-    font-size: 28px;
-}
-
-.perfil {
-    width: 45px;
-    height: 45px;
-    background-color: #dcebdd;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-}
-
-
-/* =====================================
-   SECCION DEL CALENDARIO
-===================================== */
-
-.contenido-calendario {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 25px;
-}
-
-.calendario,
-.proximos-riegos {
-    background-color: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    min-height: 300px;
-}
-
-.calendario h2,
-.proximos-riegos h2 {
-    color: #244d38;
-    margin-bottom: 20px;
-}
-
-
-/* =====================================
-   ENCABEZADO DEL CALENDARIO
-===================================== */
-
-.calendario-encabezado {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.calendario-encabezado h2 {
-    margin-bottom: 0;
-}
-
-.navegacion-mes {
+.head-tools {
     display: flex;
     align-items: center;
-    gap: 15px;
-}
-
-.navegacion-mes h3 {
-    color: #244d38;
-    min-width: 150px;
-    text-align: center;
-}
-
-.navegacion-mes button {
-    width: 35px;
-    height: 35px;
-    border: none;
-    border-radius: 8px;
-    background-color: #244d38;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.navegacion-mes button:hover {
-    background-color: #3d7553;
-}
-
-
-/* =====================================
-   DIAS DE LA SEMANA
-===================================== */
-
-.dias-semana {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.dias-semana div {
-    text-align: center;
-    padding: 12px 5px;
-    font-weight: bold;
-    color: #244d38;
-    background-color: #e8f1e8;
-    border-radius: 6px;
-}
-
-
-/* =====================================
-   CUADRICULA DEL CALENDARIO
-===================================== */
-
-.dias-calendario {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-}
-
-.dia {
-    min-height: 65px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #e0e8df;
-    border-radius: 8px;
-    background-color: white;
-    cursor: pointer;
-    transition: 0.2s;
+    gap: 10px;
     position: relative;
 }
 
-.dia:hover {
-    background-color: #e8f1e8;
-    border-color: #3d7553;
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--sunken);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    color: var(--brand-2);
 }
-
-.dia.vacio {
-    border: none;
-    background-color: transparent;
-    cursor: default;
-}
-
-.dia.hoy {
-    background-color: #dcebdd;
-    border: 2px solid #3d7553;
-    color: #244d38;
-    font-weight: bold;
-}
-
 
 /* =====================================
-   VENTANA EMERGENTE (MODAL)
+   COMPONENTES (FR-1.a)
 ===================================== */
 
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    min-width: 0;
 }
 
-.modal-contenido {
-    background-color: white;
-    width: 100%;
-    max-width: 420px;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-encabezado {
+.panel-head {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.panel h2 {
+    font-size: 17px;
+}
+
+.panel-head small,
+.panel-head a {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.panel-head a {
+    color: var(--brand-2);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+/* Chips de estado: mismos colores en todas las páginas (FR-1.d) */
+.chip {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 20px;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
-.modal-encabezado h2 {
-    color: #244d38;
-    margin-bottom: 0;
-}
-
-.cerrar-modal {
-    border: none;
-    background: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: #555;
-}
-
-.modal-contenido p {
-    margin-bottom: 20px;
-    color: #555;
-}
-
-.modal-contenido label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-.modal-contenido input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-
-/* =====================================
-   BOTONES DEL MODAL
-===================================== */
-
-.modal-botones {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
-
-.modal-botones button {
-    padding: 11px 16px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-cancelar {
-    background-color: #eeeeee;
-    color: #333;
-}
-
-.btn-cancelar:hover {
-    background-color: #dddddd;
-}
-
-.btn-guardar {
-    background-color: #244d38;
-    color: white;
-}
-
-.btn-guardar:hover {
-    background-color: #3d7553;
-}
-
-
-/* =====================================
-   DIAS CON RIEGO PROGRAMADO
-===================================== */
-
-.dia.programado {
-    background-color: #e1f1e3;
-    border: 2px solid #3d7553;
-    color: #244d38;
-    font-weight: bold;
-}
-
-.dia.programado::after {
+.chip.dot::before {
     content: "";
     width: 7px;
     height: 7px;
-    background-color: #3d7553;
     border-radius: 50%;
+    background: currentColor;
+}
+
+.chip.ok   { background: var(--ok-bg);   color: var(--ok-fg); }
+.chip.hot  { background: var(--hot-bg);  color: var(--hot-fg); }
+.chip.cold { background: var(--cold-bg); color: var(--cold-fg); }
+.chip.warn { background: var(--warn-bg); color: var(--warn-fg); }
+.chip.none { background: var(--sunken);  color: var(--muted); }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: var(--sunken);
+}
+
+.btn.primary {
+    background: var(--brand-2);
+    border-color: var(--brand-2);
+    color: var(--on-brand);
+}
+
+.btn.primary:hover {
+    filter: brightness(1.08);
+}
+
+.btn.danger {
+    color: var(--hot-fg);
+}
+
+.valor {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.valor span {
+    margin-left: 2px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+/* Tablas */
+.tabla {
+    max-height: 22rem;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.tabla table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabla th {
+    position: sticky;
+    top: 0;
+    padding: 10px 14px;
+    background: var(--sunken);
+    color: var(--muted);
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tabla td {
+    padding: 11px 14px;
+    border-top: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+.tabla tbody tr:hover {
+    background: var(--sunken);
+}
+
+/* Ventanas y formularios */
+dialog {
+    width: min(440px, calc(100vw - 32px));
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--fg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+dialog::backdrop {
+    background: var(--scrim);
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+}
+
+.dlg-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 8px;
+}
+
+.dlg-head h2 {
+    font-size: 20px;
+}
+
+.dlg-head p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.cerrar {
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.field input,
+.field select {
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--bg);
+    font-weight: 400;
+}
+
+.dlg-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.dlg-foot .danger {
+    margin-right: auto;
+}
+
+.ayuda {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}
+
+/* =====================================
+   MARCO: CAMPANA Y LISTA DE AVISOS (spec 103, 104 FR-4)
+===================================== */
+
+.icon-btn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+
+.icon-btn .count {
     position: absolute;
-    bottom: 6px;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: var(--orchid);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    display: grid;
+    place-items: center;
 }
 
-
-/* =====================================
-   LISTA DE PROXIMOS RIEGOS
-===================================== */
-
-.riego-item {
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: #e8f1e8;
-    border-radius: 8px;
-    border-left: 4px solid #3d7553;
+.avisos {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    z-index: 20;
+    width: min(340px, calc(100vw - 32px));
+    max-height: 70vh;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
 }
 
-.riego-item strong {
-    display: block;
-    color: #244d38;
-    margin-bottom: 5px;
+.avisos header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
 }
 
-.riego-item span {
+.permiso-avisos:not(:empty),
+.mensaje-avisos {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
     font-size: 13px;
-    color: #555;
+    color: var(--muted);
 }
 
+.mensaje-avisos {
+    color: var(--hot-fg);
+}
+
+.boton-permiso {
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--brand-2);
+    color: var(--on-brand);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.lista-avisos {
+    list-style: none;
+}
+
+.sin-avisos {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.avisos .aviso {
+    display: grid;
+    grid-template-columns: 8px 1fr;
+    gap: 4px 10px;
+    width: 100%;
+    padding: 12px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: none;
+    text-align: left;
+    font-size: 14px;
+}
+
+.avisos button.aviso {
+    cursor: pointer;
+}
+
+.avisos button.aviso:hover {
+    background: var(--sunken);
+}
+
+.avisos button.aviso:focus-visible {
+    outline-offset: -2px;
+}
+
+.avisos .pip {
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: var(--orchid);
+}
+
+.avisos .leido .pip {
+    background: transparent;
+}
+
+.avisos .tipo {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.avisos .msg {
+    grid-column: 2;
+}
+
+.avisos .leido .msg {
+    color: var(--muted);
+}
+
+.avisos .nuevo {
+    color: var(--orchid);
+    font-weight: 600;
+}
 
 /* =====================================
-   ADAPTACION A PANTALLAS PEQUEÑAS
+   MARCO EN PANTALLAS ANGOSTAS (FR-2.e)
+   La barra pasa a una franja sobre el contenido: logo y "Cerrar sesión"
+   arriba, los enlaces debajo con scroll propio (D4: salir siempre visible).
 ===================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
 
-    .contenedor {
+    .app {
         flex-direction: column;
     }
 
-    .menu-lateral {
+    .sidebar {
+        position: static;
         width: 100%;
+        height: auto;
+        overflow: visible;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 12px 16px;
     }
 
-    .contenido-calendario {
+    .logo {
+        padding: 0;
+        font-size: 18px;
+    }
+
+    .sidebar .salir {
+        margin-top: 0;
+        padding: 8px 10px;
+    }
+
+    .sidebar nav {
+        order: 3;
+        width: 100%;
+        flex-direction: row;
+        gap: 2px;
+        overflow-x: auto;
+    }
+
+    .sidebar a {
+        padding: 8px 10px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .sidebar a.activo {
+        box-shadow: inset 0 -2px 0 var(--orchid-soft);
+    }
+
+    .head h1 {
+        font-size: 24px;
+    }
+}
+
+
+/* =====================================
+   CALENDARIO COMPARTIDO (spec 105 plan D5)
+   Home y el Calendario de riego dibujan el mismo mes.
+===================================== */
+
+.mes-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mes-nav h3 {
+    min-width: 130px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.mes-nav button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--fg);
+    cursor: pointer;
+}
+
+.mes-nav button:hover {
+    background: var(--sunken);
+}
+
+.cal {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.cal .dow {
+    padding: 6px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cal .dia {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
+.cal button.dia {
+    cursor: pointer;
+}
+
+.cal button.dia:hover {
+    background: var(--sunken);
+}
+
+.cal .dia.hoy {
+    border-color: var(--brand-2);
+    font-weight: 700;
+}
+
+.cal .dia.pasado {
+    color: var(--muted);
+}
+
+.cal .dia.riego {
+    background: var(--ok-bg);
+    color: var(--ok-fg);
+    font-weight: 600;
+}
+
+.cal .dia.riego::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-2);
+}
+
+.leyenda {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.leyenda i {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--brand-2);
+    border-radius: 4px;
+    background: var(--ok-bg);
+}
+
+
+/* =====================================
+   CALENDARIO DE RIEGO (spec 105 FR-4 a FR-6)
+===================================== */
+
+.mes-nav .btn {
+    width: auto;
+    padding: 0 12px;
+}
+
+.cal-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+
+/* Cada día muestra las horas de sus riegos (FR-4.a) */
+.cal-grande .dia {
+    aspect-ratio: auto;
+    min-height: 84px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 8px;
+    border-color: var(--line);
+    background: var(--surface);
+}
+
+.cal-grande .dia.vacio {
+    border-color: transparent;
+    background: transparent;
+}
+
+.cal-grande .dia.hoy {
+    border-color: var(--brand-2);
+}
+
+.cal-grande .dia.riego {
+    background: var(--ok-bg);
+}
+
+.cal-grande .dia.riego::after {
+    display: none;
+}
+
+.cal-grande .horas {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.cal-grande .horas span {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--brand-2);
+    color: var(--on-brand);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: left;
+}
+
+/* Próximos riegos (FR-5) */
+.lista-riegos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+}
+
+.lista-riegos li {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--sunken);
+}
+
+.lista-riegos li.vacio,
+.lista-riegos li.mensaje-error {
+    display: block;
+}
+
+.fecha-box {
+    padding: 4px 0;
+    border-radius: 8px;
+    background: var(--surface);
+    text-align: center;
+    line-height: 1.1;
+}
+
+.fecha-box b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 20px;
+}
+
+.fecha-box small {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.lista-riegos strong {
+    display: block;
+    font-size: 14px;
+}
+
+.lista-riegos span {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* Ventana de un día (FR-6) */
+.chips-dia {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.chips-dia button {
+    padding: 4px 12px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: var(--sunken);
+    color: var(--fg);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.chips-dia button[aria-pressed="true"] {
+    border-color: var(--brand-2);
+    background: var(--brand-2);
+    color: var(--on-brand);
+}
+
+.mensaje-error {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--hot-bg);
+    color: var(--hot-fg);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+@media (max-width: 980px) {
+
+    .cal-layout {
         grid-template-columns: 1fr;
     }
-
-    .contenido {
-        padding: 15px;
-    }
-
-    .dia {
-        min-height: 45px;
-    }
-
-    .dias-semana,
-    .dias-calendario {
-        gap: 4px;
-    }
-
-    .calendario-encabezado {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-}
-/* BOTON ELIMINAR RIEGO */
-
-.btn-eliminar {
-    background-color: #f8dddd;
-    color: #a52a2a;
-    padding: 11px 16px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
-.btn-eliminar:hover {
-    background-color: #edc2c2;
-}
+/* Pantalla angosta: cada riego es una marca sin hora (FR-4.b) */
+@media (max-width: 640px) {
 
-/* OCULTAR BOTON CUANDO NO EXISTE UN RIEGO */
+    .cal-grande .dia {
+        min-height: 56px;
+        padding: 4px;
+        font-size: 13px;
+    }
 
-.btn-eliminar.oculto {
-    display: none;
+    .cal-grande .horas span {
+        height: 5px;
+        padding: 0;
+        font-size: 0;
+    }
 }

@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Home - Orquídeas</title>
+    <!-- Tipografías del rediseño; sin red, las del sistema (spec 104 FR-1.c) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+
 
     <!-- Estilos generales de la aplicación -->
     <link rel="stylesheet" href="../styles.css">
@@ -17,175 +22,127 @@
 
 <body>
 
-    <div class="contenedor">
+    <div class="app">
 
-        <!-- MENU LATERAL -->
-        <aside class="menu-lateral">
+        <!-- BARRA LATERAL (spec 104 FR-2) -->
+        <aside class="sidebar">
 
-            <h2>Orquídeas</h2>
+            <div class="logo">
+                <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+                    <g fill="#e7a9d6">
+                        <ellipse cx="16" cy="8" rx="5" ry="7"/>
+                        <ellipse cx="8" cy="15" rx="7" ry="4.5" transform="rotate(-20 8 15)"/>
+                        <ellipse cx="24" cy="15" rx="7" ry="4.5" transform="rotate(20 24 15)"/>
+                    </g>
+                    <path d="M12 20c1 5 7 5 8 0-2 2-6 2-8 0z" fill="#fff"/>
+                    <circle cx="16" cy="16" r="2.5" fill="#f6d77a"/>
+                </svg>
+                <span>Orquídeas</span>
+            </div>
 
-            <nav>
-                <a href="home.html" class="activo">Home</a>
-
+            <nav aria-label="Páginas">
+                <a href="../Home/home.html" class="activo" aria-current="page">Home</a>
                 <a href="../Datos/datos.html">Datos</a>
-
                 <a href="../index.html">Calendario de Riego</a>
-
                 <a href="../Configuracion/configuracion.html">Configuración</a>
-                    
             </nav>
+
+            <button type="button" class="salir">Cerrar sesión</button>
 
         </aside>
 
-
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="contenido">
+        <main>
+        <div class="wrap">
 
-            <!-- ENCABEZADO -->
-            <header class="encabezado">
-
-                <h1>Panel Principal</h1>
-
-                <div class="perfil">
-                    <span>👤</span>
+            <!-- ENCABEZADO (spec 104 FR-3); la campana la pone notificaciones.js -->
+            <header class="head">
+                <div>
+                    <h1>Panel principal</h1>
+                    <p>Resumen de tu invernadero</p>
                 </div>
-
+                <div class="head-tools">
+                    <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+                </div>
             </header>
 
 
-            <!-- TEMPERATURA Y HUMEDAD -->
-            <section class="indicadores-home">
+            <!-- LECTURAS Y PROXIMO RIEGO (spec 105 FR-1, FR-2) -->
+            <section class="home-top">
 
-                <div class="indicador">
-
-                    <div class="indicador-dato">
-                        <span id="temperatura">25</span>
-                        <span>°C</span>
-                    </div>
-
-                    <p>Temperatura ambiental</p>
-
+                <div class="panel lectura">
+                    <div class="row">Temperatura <span id="estadoTemperatura" class="chip none">Sin lecturas</span></div>
+                    <div class="valor"><b id="temperatura">--</b><span>°C</span></div>
+                    <small id="detalleTemperatura"></small>
                 </div>
 
+                <div class="panel lectura">
+                    <div class="row">Humedad <span id="estadoHumedad" class="chip none">Sin lecturas</span></div>
+                    <div class="valor"><b id="humedad">--</b><span>%</span></div>
+                    <small id="detalleHumedad"></small>
+                </div>
 
-                <div class="separador"></div>
-
-
-                <div class="indicador">
-
-                    <div class="indicador-dato">
-                        <span id="humedad">75</span>
-                        <span>%</span>
-                    </div>
-
-                    <p>Humedad ambiental</p>
-
+                <div class="panel proximo">
+                    <span class="eyebrow">Próximo riego</span>
+                    <span class="cuando" id="proxCuando">--</span>
+                    <span class="cuenta" id="proxCuenta"></span>
+                    <a href="../index.html">Ver calendario →</a>
                 </div>
 
             </section>
 
 
-            <p class="descripcion-home">
-                Información actual del ambiente de tus orquídeas
-            </p>
+            <!-- CALENDARIO Y RELOJ (spec 105 FR-3) -->
+            <section class="home-bottom">
 
+                <div class="panel">
 
-            <!-- SECCION INFERIOR -->
-            <section class="seccion-inferior">
-
-
-                <!-- CALENDARIO DE RIEGO -->
-                <div class="tarjeta-home calendario-home">
-
-                    <div class="titulo-tarjeta">
-
+                    <div class="panel-head">
                         <h2>Fechas de riego</h2>
-
-                        <a href="../index.html">Ver calendario</a>
-
+                        <div class="mes-nav">
+                            <button id="mesAnteriorHome" type="button" aria-label="Mes anterior">‹</button>
+                            <h3 id="mesActualHome"></h3>
+                            <button id="mesSiguienteHome" type="button" aria-label="Mes siguiente">›</button>
+                        </div>
                     </div>
 
+                    <div id="calendarioHome" class="cal"></div>
 
-                    <div class="mes-home">
-
-                        <button id="mesAnteriorHome" type="button">
-                            &lt;
-                        </button>
-
-                        <h3 id="mesActualHome"></h3>
-
-                        <button id="mesSiguienteHome" type="button">
-                            &gt;
-                        </button>
-
-                    </div>
-
-
-                    <div class="dias-semana-home">
-
-                        <span>Lun</span>
-                        <span>Mar</span>
-                        <span>Mié</span>
-                        <span>Jue</span>
-                        <span>Vie</span>
-                        <span>Sáb</span>
-                        <span>Dom</span>
-
-                    </div>
-
-
-                    <div id="calendarioHome" class="dias-mes-home">
-
-                    </div>
-
-                    <p class="leyenda-riego">
-                        <span></span>
-                        Días programados para riego
-                    </p>
+                    <p class="leyenda"><i></i> Días con riego programado</p>
 
                 </div>
 
+                <div class="panel reloj">
 
-                <!-- RELOJ -->
-                <div class="tarjeta-home reloj-home">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <circle cx="50" cy="50" r="46" fill="var(--sunken)" stroke="var(--line)" stroke-width="2"/>
+                        <g id="marcasReloj" stroke="var(--muted)" stroke-linecap="round"></g>
+                        <line id="manecillaHora" x1="50" y1="50" x2="50" y2="28" stroke="var(--fg)" stroke-width="4" stroke-linecap="round"/>
+                        <line id="manecillaMinuto" x1="50" y1="50" x2="50" y2="16" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+                        <line id="manecillaSegundo" x1="50" y1="56" x2="50" y2="12" stroke="var(--orchid)" stroke-width="1.2" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="3" fill="var(--orchid)"/>
+                    </svg>
 
-                    <h2>Hora actual</h2>
-
-                    <div id="horaActual" class="hora-actual">
-                        00:00:00
+                    <div>
+                        <div class="hora" id="horaActual">--:--:--</div>
+                        <small id="fechaHoy"></small>
                     </div>
-
-
-                    <div class="reloj-analogico">
-
-                        <div class="marca-reloj marca-12">12</div>
-                        <div class="marca-reloj marca-3">3</div>
-                        <div class="marca-reloj marca-6">6</div>
-                        <div class="marca-reloj marca-9">9</div>
-
-                        <div id="manecillaHora" class="manecilla hora"></div>
-
-                        <div id="manecillaMinuto" class="manecilla minuto"></div>
-
-                        <div id="manecillaSegundo" class="manecilla segundo"></div>
-
-                        <div class="centro-reloj"></div>
-
-                    </div>
-
-                    <p>Hora local del dispositivo</p>
 
                 </div>
-
 
             </section>
 
+        </div>
         </main>
 
     </div>
 
 
     <!-- JAVASCRIPT -->
+    <script src="../api.js"></script>
+
+    <script src="../notificaciones.js"></script>
+
     <script src="home.js"></script>
 
 </body>
